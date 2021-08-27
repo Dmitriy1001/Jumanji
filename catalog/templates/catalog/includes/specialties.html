@@ -1,0 +1,15 @@
+{% for specialty in specialties %}
+    <div class="col-6 col-md-6 col-lg-3">
+        <div class="card pt-4 text-center mb-4">
+            <img class="mx-auto d-block" src="{{specialty.0.picture}}" width="80" height="80" alt="{{specialty.0}}">
+            <div class="card-body">
+                <p class="card-text mb-2">{{specialty.0}}</p>
+                <p class="card-text">
+                    <a href="{% url 'specialty_vacancies_list' specialty.0.code %}">
+                        {{specialty.1}}
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+{% endfor %}

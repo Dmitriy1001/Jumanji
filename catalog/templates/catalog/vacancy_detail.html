@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}{{vacancy}} | {{block.super}}{% endblock %}
+
+{% block content %}
+
+  <main class="container mt-3 pb-5">
+    <div class="row mt-5">
+      <div class="col-12 col-lg-2">
+        <div class="pl-3 mb-5">
+          <p><a href="javascript:history.back()">Назад</a></p>
+        </div>
+      </div>
+
+      <div class="col-12 col-lg-8">
+        <section class="pl-3">
+          <a href="{% url 'company_detail' vacancy.company.id %}">
+            <img src="{{vacancy.company.logo}}" height="80" alt="{{vacancy.company}}">
+          </a>
+          <div class="d-flex align-items-baseline align-content-baseline">
+            <h1 class="h2 mt-4 font-weight-bold" >{{vacancy.title}}</h1>
+            <p class="m-0 pl-3">{{vacancy.salary_min|intcomma}} – {{vacancy.salary_max|intcomma}} Р</p>
+          </div>
+          <p class="mt-2">{{vacancy.specialty}} • {{vacancy.skills}}</p>
+          <p class="text-muted mb-4">
+            {{vacancy.company}} ({{employee_count}}), {{vacancy.company.location}}
+          </p>
+          <div style="line-height: 1.8;">
+            {{vacancy.description|safe}}
+          </div>
+
+        {% include 'catalog/includes/vacancy_reply_form.html' %}
+        </section>
+      </div>
+    </div>
+  </main>
+
+{% endblock %}
