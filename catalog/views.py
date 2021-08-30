@@ -1,3 +1,4 @@
+from django.db.models import Count
 from django.http import Http404
 from django.shortcuts import render
 
@@ -6,16 +7,14 @@ from .models import Vacancy, Specialty, Company
 
 
 def index(request):
-    specialties = {specialty: 0 for specialty in Specialty.objects.all()}
-    companies = {company: 0 for company in Company.objects.all()}
-    for vacancy in Vacancy.objects.all().select_related('specialty').select_related('company'):
-        specialties[vacancy.specialty] += 1
-        companies[vacancy.company] += 1
+    specialties = Specialty.objects.annotate(vacancies_count=Count('vacancies'))
+    companies = Company.objects.annotate(vacancies_count=Count('vacancies'))
+    for specialty in specialties:
+        specialty.vacancies_count = utils.make_correct_ending(specialty.vacancies_count, 'vacancies')
+    for company in companies:
+        company.vacancies_count = utils.make_correct_ending(company.vacancies_count, 'vacancies')
 
-    context = {
-        'specialties': {spec: utils.make_correct_ending(specialties[spec], 'vacancies') for spec in specialties},
-        'companies': {comp: utils.make_correct_ending(companies[comp], 'vacancies') for comp in companies}
-    }
+    context = {'specialties': specialties, 'companies': companies}
     return render(request, 'catalog/index.html', context)
 
 
@@ -58,8 +57,16 @@ def company_detail(request, company_id):
 
 
 def vacancy_detail(request, vacancy_id):
+    # try:
+    #     vacancy = Vacancy.objects.get(id=vacancy_id)
+    # except Vacancy.DoesNotExist:
+    #     raise Http404
+
+    vacancy = (
+        Vacancy.objects.filter(id=vacancy_id).select_related('specialty').select_related('company')
+    ) # так на два запроса в бд меньше
     try:
-        vacancy = Vacancy.objects.get(id=vacancy_id)
+        vacancy = vacancy[0]
     except Vacancy.DoesNotExist:
         raise Http404
     context = {
