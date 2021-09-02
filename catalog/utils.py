@@ -1,6 +1,6 @@
-def make_correct_ending(number, word):
+def make_ending(number, word):
     '''Makes the correct word ending for "вакансия" or "человек" depending on number. The second argument(word) must be "vacancies" or "people"'''
-    if number == 0:
+    if not number:
         return "Нет вакансий" if word == 'vacancies' else ''
     vacancies = {
         '1': 'вакансия',
@@ -21,11 +21,3 @@ def make_correct_ending(number, word):
         return f"{number} {ending[number[-1]]}"
     else:
         return f"{number} вакансий" if word == 'vacancies' else f"{number} человек"
-
-
-def add_vacancies_number(queryset):
-    '''For each instance in the queryset, forms a tuple consisting of this instance and the number of vacancies of this instance'''
-    return map(
-        lambda cls_obj: (cls_obj, make_correct_ending(cls_obj.vacancies.count(), 'vacancies')),
-        queryset,
-    )

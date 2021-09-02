@@ -10,9 +10,9 @@ def index(request):
     specialties = Specialty.objects.annotate(vacancies_count=Count('vacancies'))
     companies = Company.objects.annotate(vacancies_count=Count('vacancies'))
     for specialty in specialties:
-        specialty.vacancies_count = utils.make_correct_ending(specialty.vacancies_count, 'vacancies')
+        specialty.vacancies_count = utils.make_ending(specialty.vacancies_count, 'vacancies')
     for company in companies:
-        company.vacancies_count = utils.make_correct_ending(company.vacancies_count, 'vacancies')
+        company.vacancies_count = utils.make_ending(company.vacancies_count, 'vacancies')
 
     context = {'specialties': specialties, 'companies': companies}
     return render(request, 'catalog/index.html', context)
@@ -22,7 +22,7 @@ def vacancies_list(request):
     vacancies = Vacancy.objects.all().select_related('company').select_related('specialty')
     context = {
         'vacancies_category': 'Все вакансии',
-        'vacancies_count': utils.make_correct_ending(len(vacancies), 'vacancies'),
+        'vacancies_count': utils.make_ending(len(vacancies), 'vacancies'),
         'vacancies': vacancies,
     }
     return render(request, 'catalog/vacancies_list.html', context)
@@ -36,7 +36,7 @@ def specialty_vacancies_list(request, specialty_code):
     vacancies = specialty.vacancies.all().select_related('specialty').select_related('company')
     context = {
         'vacancies_category': specialty.title,
-        'vacancies_count': utils.make_correct_ending(len(vacancies), 'vacancies'),
+        'vacancies_count': utils.make_ending(len(vacancies), 'vacancies'),
         'vacancies': vacancies,
     }
     return render(request, 'catalog/vacancies_list.html', context)
@@ -50,7 +50,7 @@ def company_detail(request, company_id):
     vacancies = company.vacancies.all().select_related('specialty').select_related('company')
     context = {
         'company': company,
-        'vacancies_count': utils.make_correct_ending(len(vacancies), 'vacancies'),
+        'vacancies_count': utils.make_ending(len(vacancies), 'vacancies'),
         'vacancies': vacancies,
     }
     return render(request, 'catalog/company_detail.html', context)
@@ -71,6 +71,6 @@ def vacancy_detail(request, vacancy_id):
         raise Http404
     context = {
         'vacancy': vacancy,
-        'employee_count': utils.make_correct_ending(vacancy.company.employee_count, 'people')
+        'employee_count': utils.make_ending(vacancy.company.employee_count, 'people')
     }
     return render(request, 'catalog/vacancy_detail.html', context)

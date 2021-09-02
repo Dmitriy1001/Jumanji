@@ -24,6 +24,7 @@ class Vacancy(models.Model):
     class Meta:
         verbose_name = 'вакансия'
         verbose_name_plural = 'вакансии'
+        ordering = ('-published_at',)
 
     def __str__(self):
         return self.title
