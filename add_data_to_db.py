@@ -1,8 +1,16 @@
+import os
+
+import django
+
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'jumanji.settings')
+django.setup()
+
+
 import time
 from datetime import date
 
-from . import data
-from .models import Vacancy, Company, Specialty
+from catalog import data
+from catalog.models import Vacancy, Company, Specialty
 
 
 def make_date_obj(published_date: str):
@@ -12,17 +20,23 @@ def make_date_obj(published_date: str):
 
 def add_vacancy(vacancies):
     for vacancy in vacancies:
-        new_vacancy = Vacancy.objects.create(
-            title=vacancy['title'],
-            specialty=Specialty.objects.get(code=vacancy['specialty']),
-            company=Company.objects.get(id=vacancy['company']),
-            skills=vacancy['skills'].replace(', ', ' • '),
-            description=vacancy['description'],
-            salary_min=int(vacancy['salary_from']),
-            salary_max=int(vacancy['salary_to']),
-            published_at=make_date_obj(vacancy['posted'])
-        )
-        print(f'Vacancy "{new_vacancy}" added to the database')
+        if not Vacancy.objects.filter(title=vacancy['title'], published_at=make_date_obj(vacancy['posted'])):
+            new_vacancy = Vacancy.objects.create(
+                title=vacancy['title'],
+                specialty=Specialty.objects.get(code=vacancy['specialty']),
+                company=Company.objects.get(
+                    name=list(filter(lambda x: x['id'] == vacancy['company'], data.companies))[0]['title']
+                ), # В случае если компания будет удалена, а потом снова добавлена в бд,
+                   # у нее поменяется id, поэтому лучше брать по имени, которое уникально(unique=True)
+                skills=vacancy['skills'].replace(', ', ' • '),
+                description=vacancy['description'],
+                salary_min=int(vacancy['salary_from']),
+                salary_max=int(vacancy['salary_to']),
+                published_at=make_date_obj(vacancy['posted'])
+            )
+            print(f'Vacancy "{new_vacancy}" added to the database')
+        else:
+            print(f'Job with title \"{vacancy["title"]}\" and date \"{vacancy["posted"]}\" already exists in the database')
         time.sleep(1)
 
 
@@ -67,4 +81,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+   main()
