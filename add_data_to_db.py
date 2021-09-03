@@ -26,8 +26,9 @@ def add_vacancy(vacancies):
                 specialty=Specialty.objects.get(code=vacancy['specialty']),
                 company=Company.objects.get(
                     name=list(filter(lambda x: x['id'] == vacancy['company'], data.companies))[0]['title']
-                ), # В случае если компания будет удалена, а потом снова добавлена в бд,
-                   # у нее поменяется id, поэтому лучше брать по имени, которое уникально(unique=True)
+                ), # В data.py id у компаний зафиксированы, но в реальности они могут поменяться,
+                   # например, если компания будет удалена, а потом снова добавлена в бд,
+                   # поэтому здесь лучше брать по имени, которое уникально(unique=True)
                 skills=vacancy['skills'].replace(', ', ' • '),
                 description=vacancy['description'],
                 salary_min=int(vacancy['salary_from']),
