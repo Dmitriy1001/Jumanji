@@ -7,13 +7,13 @@ class Vacancy(models.Model):
         'Specialty',
         related_name='vacancies',
         on_delete=models.CASCADE,
-        verbose_name='Специализация'
+        verbose_name='Специализация',
     )
     company = models.ForeignKey(
         'Company',
         related_name='vacancies',
         on_delete=models.CASCADE,
-        verbose_name='Компания'
+        verbose_name='Компания',
     )
     skills = models.TextField(verbose_name='Навыки')
     description = models.TextField(verbose_name='Текст')

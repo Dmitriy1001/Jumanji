@@ -19,7 +19,7 @@ def index(request):
 
 
 def vacancies_list(request):
-    vacancies = Vacancy.objects.all().select_related('company').select_related('specialty')
+    vacancies = Vacancy.objects.select_related('company').select_related('specialty')
     context = {
         'vacancies_category': 'Все вакансии',
         'vacancies_count': utils.make_ending(len(vacancies), 'vacancies'),
@@ -32,8 +32,8 @@ def specialty_vacancies_list(request, specialty_code):
     try:
         specialty = Specialty.objects.get(code=specialty_code)
     except Specialty.DoesNotExist:
-        raise Http404
-    vacancies = specialty.vacancies.all().select_related('specialty').select_related('company')
+        raise Http404('Рубрика не найдена')
+    vacancies = specialty.vacancies.select_related('specialty').select_related('company')
     context = {
         'vacancies_category': specialty.title,
         'vacancies_count': utils.make_ending(len(vacancies), 'vacancies'),
@@ -46,8 +46,8 @@ def company_detail(request, company_id):
     try:
         company = Company.objects.get(id=company_id)
     except Company.DoesNotExist:
-        raise Http404
-    vacancies = company.vacancies.all().select_related('specialty').select_related('company')
+        raise Http404('Компания не найдена')
+    vacancies = company.vacancies.select_related('specialty').select_related('company')
     context = {
         'company': company,
         'vacancies_count': utils.make_ending(len(vacancies), 'vacancies'),
@@ -57,20 +57,14 @@ def company_detail(request, company_id):
 
 
 def vacancy_detail(request, vacancy_id):
-    # try:
-    #     vacancy = Vacancy.objects.get(id=vacancy_id)
-    # except Vacancy.DoesNotExist:
-    #     raise Http404
-
-    vacancy = (
-        Vacancy.objects.filter(id=vacancy_id).select_related('specialty').select_related('company')
-    ) # так на два запроса в бд меньше
     try:
-        vacancy = vacancy[0]
+        vacancy = (
+            Vacancy.objects.select_related('specialty').select_related('company').get(id=vacancy_id)
+        )
     except Vacancy.DoesNotExist:
-        raise Http404
+        raise Http404('Вакансия не найдена')
     context = {
         'vacancy': vacancy,
-        'employee_count': utils.make_ending(vacancy.company.employee_count, 'people')
+        'employee_count': utils.make_ending(vacancy.company.employee_count, 'people'),
     }
     return render(request, 'catalog/vacancy_detail.html', context)

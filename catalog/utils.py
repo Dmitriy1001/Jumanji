@@ -1,7 +1,9 @@
 def make_ending(number, word):
-    '''Makes the correct word ending for "вакансия" or "человек" depending on number. The second argument(word) must be "vacancies" or "people"'''
+    '''Makes the correct word ending for "вакансия" or "человек" depending on number.
+The second argument(word) must be "vacancies" or "people"'''
+    none_value = {'vacancies': 'Нет вакансий', 'people': ''}
     if not number:
-        return "Нет вакансий" if word == 'vacancies' else ''
+        return none_value[word]
     vacancies = {
         '1': 'вакансия',
         '2': 'вакансии', '3': 'вакансии', '4': 'вакансии',
@@ -19,5 +21,4 @@ def make_ending(number, word):
     ending = vacancies if word == 'vacancies' else people
     if number not in ('11', '12', '13', '14'):
         return f"{number} {ending[number[-1]]}"
-    else:
-        return f"{number} вакансий" if word == 'vacancies' else f"{number} человек"
+    return f"{number} вакансий" if word == 'vacancies' else f"{number} человек"
