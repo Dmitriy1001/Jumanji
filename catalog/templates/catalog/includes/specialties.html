@@ -1,3 +1,5 @@
+{% load catalog_filters %}
+
 {% for specialty in specialties %}
     <div class="col-6 col-md-6 col-lg-3">
         <div class="card pt-4 text-center mb-4">
@@ -8,7 +10,7 @@
                 <p class="card-text mb-2">{{specialty.title}}</p>
                 <p class="card-text">
                     <a href="{% url 'specialty_vacancies_list' specialty.code %}">
-                        {{specialty.vacancies_count}}
+                        {{specialty.vacancies_count|ending:'вакансия'}}
                     </a>
                 </p>
             </div>

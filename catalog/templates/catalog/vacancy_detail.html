@@ -1,5 +1,6 @@
 {% extends 'base.html' %}
 {% load humanize %}
+{% load catalog_filters %}
 
 {% block title %}{{vacancy}} | {{block.super}}{% endblock %}
 
@@ -22,9 +23,13 @@
             <h1 class="h2 mt-4 font-weight-bold" >{{vacancy.title}}</h1>
             <p class="m-0 pl-3">{{vacancy.salary_min|intcomma}} – {{vacancy.salary_max|intcomma}} Р</p>
           </div>
-          <p class="mt-2">{{vacancy.specialty}} • {{vacancy.skills}}</p>
+          <p class="mt-2">
+            <a href="{% url 'specialty_vacancies_list' vacancy.specialty.code %}" style="color:black";>{{vacancy.specialty}}</a>
+            • {{vacancy.skills|bullet}}
+          </p>
           <p class="text-muted mb-4">
-            {{vacancy.company}} ({{employee_count}}), {{vacancy.company.location}}
+            {{vacancy.company}}{% if vacancy.company.employee_count %}({{vacancy.company.employee_count|ending:'человек'}}){% endif %},
+            {{vacancy.company.location}}
           </p>
           <div style="line-height: 1.8;">
             {{vacancy.description|safe}}

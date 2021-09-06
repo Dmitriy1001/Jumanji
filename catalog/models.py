@@ -47,7 +47,7 @@ class Company(models.Model):
 
 class Specialty(models.Model):
     code = models.SlugField(unique=True, verbose_name='Код')
-    title = models.CharField(max_length=255, verbose_name='Название')
+    title = models.CharField(unique=True, max_length=255, verbose_name='Название')
     picture = models.URLField(default='https://place-hold.it/100x60', verbose_name='Картинка')
 
     class Meta:
