@@ -35,4 +35,4 @@ The second argument(word) must be "вакансия" or "человек"'''
 @register.filter
 def bullet(string):
     '''Separates items in a string with " • "'''
-    return ' • '.join(re.findall(r'([\w\s]+)[,\s]*', string))
+    return ' • '.join(re.findall(r'([\w\s]+)[,;\s]*', string))
