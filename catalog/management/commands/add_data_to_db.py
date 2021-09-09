@@ -7,17 +7,13 @@ from catalog import data
 from catalog.models import Vacancy, Specialty, Company
 
 
-logging.basicConfig(
-    level=logging.INFO,
-    filename='catalog/models.log',
-    format='%(levelname)s: %(message)s',
-)
+custom_logger = logging.getLogger('add_data_logger')
 
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
         current_datetime = datetime.today().strftime('%d-%b-%Y %H:%M:%S')
-        with open('catalog/models.log', 'a') as log:
+        with open('catalog/management/add_data_to_db.log', 'a') as log:
             log.write(f'{"-" * 21}\n{current_datetime}\n')
         self.add_speciality(data.specialties)
         self.add_company(data.companies)
@@ -31,9 +27,9 @@ class Command(BaseCommand):
                     title=speciality['title'],
                     picture='https://place-hold.it/100x60',
                 )
-                logging.info(f'Specialty "{new_specialty}" added to database')
+                custom_logger.info(f'Specialty "{new_specialty}" added to database')
             else:
-                logging.error(
+                custom_logger.error(
                     f'Specialty with the code \"{speciality["code"]}\" already exists in database',
                 )
 
@@ -47,9 +43,9 @@ class Command(BaseCommand):
                     description=company['description'],
                     employee_count=int(company['employee_count']),
                 )
-                logging.info(f'Company "{new_company}" added to database')
+                custom_logger.info(f'Company "{new_company}" added to database')
             else:
-                logging.error(f'Company with name \"{company["title"]}\" already exists in database')
+                custom_logger.error(f'Company with name \"{company["title"]}\" already exists in database')
 
     def add_vacancy(self, vacancies):
         for vacancy in vacancies:
@@ -72,9 +68,9 @@ class Command(BaseCommand):
                     salary_max=int(vacancy['salary_to']),
                     published_at=self.make_date_obj(vacancy['posted']),
                 )
-                logging.info(f'Vacancy "{new_vacancy}" added to database')
+                custom_logger.info(f'Vacancy "{new_vacancy}" added to database')
             else:
-                logging.error(
+                custom_logger.error(
                     (
                         f'Vacancy with title \"{vacancy["title"]}\" and date \"{vacancy["posted"]}\" '
                         f'already exists in database'
@@ -84,3 +80,40 @@ class Command(BaseCommand):
     def make_date_obj(self, published_date: str):
         year, month, day = map(int, published_date.split('-'))
         return date(year, month, day)
+
+
+logging.config.dictConfig({
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'console': {
+            'format': '%(name)-12s %(levelname)-8s %(message)s',
+        },
+        'file': {
+            'format': '%(name)-12s %(levelname)-8s %(message)s',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'console',
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'formatter': 'file',
+            'filename': 'catalog/management/add_data_to_db.log',
+        },
+    },
+    'loggers': {
+        'add_data_logger': {
+            'level': 'INFO',
+            'handlers': ['console', 'file'],
+            'propagate': True,
+        },
+        'django.db.backends': {
+            'level': 'DEBUG',
+            'handlers': ['file'],
+        },
+    },
+})
