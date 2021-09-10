@@ -53,3 +53,32 @@ def vacancy_detail(request, vacancy_id):
     except Vacancy.DoesNotExist:
         raise Http404('Вакансия не найдена')
     return render(request, 'catalog/vacancy_detail.html', {'vacancy': vacancy})
+
+
+def vacancy_send(request, vacancy_id):
+    return render(request, 'catalog/vacancy_send.html', {'vacancy_id': vacancy_id})
+
+
+def mycompany_letsstart(request):
+    return render(request, 'catalog/mycompany_letsstart.html')
+
+
+def mycompany_create(request):
+    return render(request, 'catalog/mycompany_create.html')
+
+
+def mycompany(request):
+    return render(request, 'catalog/mycompany.html')
+
+
+def my_vacancies(request):
+    return render(request, 'catalog/my_vacancies.html')
+
+
+def my_vacancies_create(request):
+    return render(request, 'catalog/my_vacancies_create.html')
+
+
+def my_vacancy_detail(request, vacancy_id):
+    return render(request, 'catalog/my_vacancy_detail.html')
+

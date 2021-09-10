@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block title %}Вакансии компании | {{block.super}}{% endblock %}
+
+{% block content %}
+
+  <style>
+    body {
+      background-color: #F6F2E6;
+    }
+  </style>
+
+  <main class="container mt-3 pb-5">
+    <div class="row mt-5">
+      <div class="col-12 col-lg-4">
+        <aside class="pt-3 pb-4 px-4 mb-5 card">
+          <h1 class="h4 pt-2 pb-2">Моя компания</h1>
+          <div class="nav flex-column nav-pills">
+            <a class="nav-link" href="#">1. Информация о&nbsp;компании</a>
+            <a class="nav-link active" href="#">2. Вакансии</a>
+          </div>
+        </aside>
+      </div>
+
+      <div class="col-12 col-lg-8">
+        <div class="card">
+          <div class="card-body px-4 pb-4 tab-content">
+
+            <!-- Tab -->
+            <section>
+              <h2 class="h4 pt-2 pb-3">Backend Middle/Senior</h2>
+
+              <form action="/echo" enctype="multipart/form-data">
+                <div class="row">
+                  <div class="col-12 col-md-6">
+                    <div class="form-group pb-2">
+                      <label class="mb-2 text-dark" for="vacancyTitle">Название вакансии</label>
+                      <input class="form-control" type="text" value="" id="vacancyTitle">
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <div class="form-group pb-2">
+                      <label class="mb-2 text-dark" for="userSpecialization">Специализация</label>
+                      <select class="custom-select mr-sm-2" id="userSpecialization">
+                        <option selected></option>
+                        <option value="1"></option>
+
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-12 col-md-6">
+                    <div class="form-group pb-2">
+                      <label class="mb-2 text-dark" for="vacancySalaryMin">Зарплата от</label>
+                      <input class="form-control" type="text" value="" id="vacancySalaryMin">
+                    </div>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <div class="form-group pb-2">
+                      <label class="mb-2" for="vacancySalaryMax">Зарплата до</label>
+                      <input class="form-control" type="text" value="" id="vacancySalaryMax">
+                    </div>
+                  </div>
+                </div>
+                <div class="form-group pb-2">
+                  <label class="mb-2 text-dark" for="vacancySkills">Требуемые навыки</label>
+                  <textarea class="form-control" rows="3" id="vacancySkills" style="color:#000;"></textarea>
+                </div>
+                <div class="form-group pb-2">
+                  <label class="mb-2 text-dark" for="vacancyDescription">Описание вакансии</label>
+                  <textarea class="form-control" rows="13" id="vacancyDescription" style="color:#000;">
+
+                  </textarea>
+                </div>
+                <div class="form-group">
+                  <input type="submit" class="btn btn-info" value="Сохранить">
+                </div>
+              </form>
+              <!-- END Vacancy info -->
+
+            </section>
+            <!-- END Tab -->
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+{% endblock %}
+
