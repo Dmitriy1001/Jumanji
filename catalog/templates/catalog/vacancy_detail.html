@@ -17,7 +17,7 @@
       <div class="col-12 col-lg-8">
         <section class="pl-3">
           <a href="{% url 'company_detail' vacancy.company.id %}">
-            <img src="{{vacancy.company.logo}}" height="80" alt="{{vacancy.company}}">
+            <img src="{{vacancy.company.logo.url}}" height="80" alt="{{vacancy.company}}">
           </a>
           <div class="d-flex align-items-baseline align-content-baseline">
             <h1 class="h2 mt-4 font-weight-bold" >{{vacancy.title}}</h1>
