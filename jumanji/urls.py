@@ -19,10 +19,14 @@ from django.contrib import admin
 from django.urls import path, include
 
 from . import handlers
+from accounts import views as account_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('catalog.urls')),
+    path('login/', account_views.login),
+    path('register/', account_views.register),
+    # path('logout/'),
 ]
 
 if settings.DEBUG:

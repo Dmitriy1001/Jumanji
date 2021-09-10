@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.humanize',
     'debug_toolbar',
     'catalog.apps.CatalogConfig',
+    'accounts.apps.AccountsConfig',
 ]
 
 MIDDLEWARE = [

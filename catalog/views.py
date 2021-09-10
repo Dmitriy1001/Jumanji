@@ -82,3 +82,6 @@ def my_vacancies_create(request):
 def my_vacancy_detail(request, vacancy_id):
     return render(request, 'catalog/my_vacancy_detail.html')
 
+
+
+

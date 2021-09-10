@@ -21,8 +21,5 @@ urlpatterns = [
     path('mycompany/vacancies/', views.my_vacancies),
     path('mycompany/vacancies/create/', views.my_vacancies_create),
     path('mycompany/vacancies/<int:vacancy_id>/', views.my_vacancy_detail),
-    # account
-    # path('login/'),
-    # path('register/'),
-    # path('logout/'),
+
 ]
