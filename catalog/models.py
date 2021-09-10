@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class Vacancy(models.Model):
@@ -33,9 +34,10 @@ class Vacancy(models.Model):
 class Company(models.Model):
     name = models.CharField(unique=True, max_length=255, verbose_name='Название')
     location = models.CharField(max_length=255, verbose_name='Город')
-    logo = models.URLField(default='https://place-hold.it/100x60', verbose_name='Логотипчик')
+    logo = models.ImageField(upload_to='company_images', verbose_name='Логотипчик')
     description = models.TextField(verbose_name='Информация о компании')
     employee_count = models.PositiveIntegerField(verbose_name='Количество сотрудников')
+    owner = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Владелец')
 
     class Meta:
         verbose_name = 'компания'
@@ -48,7 +50,7 @@ class Company(models.Model):
 class Specialty(models.Model):
     code = models.SlugField(unique=True, verbose_name='Код')
     title = models.CharField(unique=True, max_length=255, verbose_name='Название')
-    picture = models.URLField(default='https://place-hold.it/100x60', verbose_name='Картинка')
+    picture = models.ImageField(upload_to='speciality_images', verbose_name='Картинка')
 
     class Meta:
         verbose_name = 'специализация'
@@ -56,3 +58,28 @@ class Specialty(models.Model):
 
     def __str__(self):
         return self.title
+
+
+class Application(models.Model):
+    written_username = models.CharField(max_length=255, verbose_name='Имя')
+    written_phone = models.CharField(max_length=255, verbose_name='Телефон')
+    written_cover_letter = models.TextField(verbose_name='Сопроводительное письмо')
+    vacancy = models.ForeignKey(
+        Vacancy,
+        related_name='applications',
+        on_delete=models.CASCADE,
+        verbose_name='Вакансия',
+    )
+    user = models.ForeignKey(
+        User,
+        related_name='applications',
+        on_delete=models.CASCADE,
+        verbose_name='Пользователь',
+    )
+
+    class Meta:
+        verbose_name = 'отклик'
+        verbose_name_plural = 'отклики'
+
+    def __str__(self):
+        return f'{self.written_username} откликнулся на "{self.vacancy}"'
