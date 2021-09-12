@@ -35,7 +35,13 @@
             {{vacancy.description|safe}}
           </div>
 
-        {% include 'catalog/includes/vacancy_reply_form.html' %}
+        {% if user.is_authenticated %}
+          {% include 'catalog/includes/vacancy_reply_form.html' %}
+        {% else %}
+          <div class="mt-4 text-center">
+            <p><a href="{% url 'login' %}" target="_blank">Авторизируйтесь</a>, чтобы стала доступна форма отклика на вакансию</p>
+          </div>
+        {% endif %}
         </section>
       </div>
     </div>

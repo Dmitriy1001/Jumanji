@@ -1,18 +1,21 @@
-<form action="/echo" class="card mt-4 mb-3" enctype="multipart/form-data">
+<form action="" method="post" class="card mt-4 mb-3" enctype="multipart/form-data">
+    {% csrf_token %}
     <div class="card-body mx-3">
         <p class="h5 mt-3 font-weight-normal">Отозваться на вакансию</p>
+
         <div class="form-group">
             <label class="mb-1 mt-2" for="userName">Вас зовут</label>
-            <input class="form-control" type="text" placeholder="" id="userName">
+            <input class="form-control" name="written_username" type="text" placeholder="" id="userName">
         </div>
         <div class="form-group">
             <label class="mb-1" for="userPhone">Ваш телефон</label>
-            <input class="form-control" type="tel" placeholder="" id="userPhone">
+            <input class="form-control" name="written_phone" type="tel" placeholder="" id="userPhone">
         </div>
         <div class="form-group">
             <label class="mb-1" for="userMsg" >Сопроводительное письмо</label>
-            <textarea class="form-control" rows="8" id="userMsg"></textarea>
+            <textarea class="form-control" name="written_cover_letter" rows="8" id="userMsg"></textarea>
         </div>
+
         <input type="submit" class="btn btn-primary mt-4 mb-2" value="Записаться на пробный урок">
     </div>
 </form>

@@ -1,7 +1,8 @@
 from django.db.models import Count
 from django.http import Http404
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 
+from .forms import ApplicationForm, CompanyForm
 from .models import Vacancy, Specialty, Company
 
 
@@ -52,35 +53,50 @@ def vacancy_detail(request, vacancy_id):
         )
     except Vacancy.DoesNotExist:
         raise Http404('Вакансия не найдена')
-    return render(request, 'catalog/vacancy_detail.html', {'vacancy': vacancy})
+    if request.method == 'POST':
+        form = ApplicationForm(request.POST)
+        if form.is_valid():
+            application = form.save(commit=False)
+            application.vacancy = vacancy
+            application.user = request.user
+            application.save()
+            return redirect('vacancy_send', vacancy_id)
+    else:
+        form = ApplicationForm()
+    return render(request, 'catalog/vacancy_detail.html', {'vacancy': vacancy, 'form': form})
 
 
 def vacancy_send(request, vacancy_id):
     return render(request, 'catalog/vacancy_send.html', {'vacancy_id': vacancy_id})
 
 
-def mycompany_letsstart(request):
-    return render(request, 'catalog/mycompany_letsstart.html')
-
-
-def mycompany_create(request):
-    return render(request, 'catalog/mycompany_create.html')
-
-
-def mycompany(request):
-    return render(request, 'catalog/mycompany.html')
-
-
-def my_vacancies(request):
-    return render(request, 'catalog/my_vacancies.html')
-
-
-def my_vacancies_create(request):
-    return render(request, 'catalog/my_vacancies_create.html')
-
-
-def my_vacancy_detail(request, vacancy_id):
-    return render(request, 'catalog/my_vacancy_detail.html')
+# def mycompany_letsstart(request):
+#     return render(request, 'catalog/mycompany_letsstart.html')
+#
+#
+# def mycompany_create(request):
+#     return render(request, 'catalog/mycompany_create.html')
+#
+#
+# def mycompany(request):
+#     try:
+#         company = request.user.company
+#         form = CompanyForm(instance=company)
+#         return render(request, 'catalog/mycompany.html', {'company': company, 'form': form})
+#     except Company.DoesNotExist:
+#         return render(request, 'catalog/mycompany_letsstart.html')
+#
+#
+# def my_vacancies(request):
+#     return render(request, 'catalog/my_vacancies.html')
+#
+#
+# def my_vacancies_create(request):
+#     return render(request, 'catalog/my_vacancies_create.html')
+#
+#
+# def my_vacancy_detail(request, vacancy_id):
+#     return render(request, 'catalog/my_vacancy_detail.html')
 
 
 
