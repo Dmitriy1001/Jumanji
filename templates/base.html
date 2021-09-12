@@ -25,17 +25,17 @@
         <ul class="navbar-nav col-2 justify-content-end">
           <li class="nav-item active">
             {% if not user.is_authenticated %}
-              <a href="#" class="nav-link font-weight-bold">Вход</a>
+              <a href="{% url 'login' %}" class="nav-link font-weight-bold">Вход</a>
             {% else %}
               <div class="btn-group">
                 <button type="button" class="btn dropdown-toggle font-weight-bold" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Иван Топорыжкин
+                  {{user.first_name}} {{user.last_name}}
                 </button>
                 <div class="dropdown-menu dropdown-menu-right mt-3">
                   <a href="#" class="dropdown-item py-2">Профиль</a>
                   <a href="#" class="dropdown-item py-2">Резюме</a>
                   <a href="#" class="dropdown-item py-2">Компания</a>
-                  <a href="#" class="dropdown-item py-2">Выйти</a>
+                  <a href="{% url 'logout' %}" class="dropdown-item py-2">Выйти</a>
                 </div>
               </div>
             {% endif %}
