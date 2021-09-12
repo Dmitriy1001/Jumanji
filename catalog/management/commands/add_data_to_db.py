@@ -7,6 +7,7 @@ from django.core.management.base import BaseCommand
 from catalog import data
 from catalog.models import Vacancy, Specialty, Company
 
+
 custom_logger = logging.getLogger('add_data_logger')
 
 
