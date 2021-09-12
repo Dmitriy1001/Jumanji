@@ -15,7 +15,11 @@ class CompanyAdmin(admin.ModelAdmin):
 
 @admin.register(Application)
 class ApplicationAdmin(admin.ModelAdmin):
-    list_display = ('written_username', 'written_phone', 'vacancy', 'user')
+    list_display = ('description', 'written_username', 'written_phone', 'vacancy', 'user')
+    readonly_fields = ('description',)
+
+    def description(self, application):
+        return f'отклик пользователя {application.written_username} на "{application.vacancy}"'
 
 
 @admin.register(Specialty)
