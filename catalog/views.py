@@ -1,3 +1,4 @@
+from django.contrib import messages
 from django.db.models import Count
 from django.http import Http404
 from django.shortcuts import render, redirect
@@ -70,33 +71,56 @@ def vacancy_send(request, vacancy_id):
     return render(request, 'catalog/vacancy_send.html', {'vacancy_id': vacancy_id})
 
 
-# def mycompany_letsstart(request):
-#     return render(request, 'catalog/mycompany_letsstart.html')
-#
-#
-# def mycompany_create(request):
-#     return render(request, 'catalog/mycompany_create.html')
-#
-#
-# def mycompany(request):
-#     try:
-#         company = request.user.company
-#         form = CompanyForm(instance=company)
-#         return render(request, 'catalog/mycompany.html', {'company': company, 'form': form})
-#     except Company.DoesNotExist:
-#         return render(request, 'catalog/mycompany_letsstart.html')
-#
-#
-# def my_vacancies(request):
-#     return render(request, 'catalog/my_vacancies.html')
-#
-#
-# def my_vacancies_create(request):
-#     return render(request, 'catalog/my_vacancies_create.html')
-#
-#
-# def my_vacancy_detail(request, vacancy_id):
-#     return render(request, 'catalog/my_vacancy_detail.html')
+def mycompany_letsstart(request):
+    return render(request, 'catalog/mycompany_letsstart.html')
+
+
+def mycompany_create(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            form = CompanyForm(request.POST, request.FILES)
+            if form.is_valid():
+                company = form.save(commit=False)
+                company.owner = request.user
+                company.save()
+                messages.success(request, 'Компания создана')
+                return redirect('mycompany')
+        else:
+            form = CompanyForm()
+        msgs = [msg.message for msg in request._messages]
+        msg = msgs[0] if msgs else ''
+        return render(request, 'catalog/mycompany_create.html', {'form': form, 'msg': msg})
+
+
+def mycompany(request):
+    try:
+        company = request.user.company
+    except Company.DoesNotExist:
+        return render(request, 'catalog/mycompany_letsstart.html')
+    if request.method == 'POST':
+        form = CompanyForm(request.POST, request.FILES, instance=company)
+        if form.is_valid():
+            company = form.save()
+            messages.success(request, 'Информация о компании обновлена')
+            return redirect('mycompany')
+    else:
+        form = CompanyForm(instance=company)
+    msgs = [msg.message for msg in request._messages]
+    msg = msgs[0] if msgs else ''
+    return render(request, 'catalog/mycompany.html', {'form': form, 'msg': msg})
+
+
+
+def my_vacancies(request):
+    return render(request, 'catalog/my_vacancies.html')
+
+
+def my_vacancies_create(request):
+    return render(request, 'catalog/my_vacancies_create.html')
+
+
+def my_vacancy_detail(request, vacancy_id):
+    return render(request, 'catalog/my_vacancy_detail.html')
 
 
 
