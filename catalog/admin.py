@@ -15,11 +15,17 @@ class CompanyAdmin(admin.ModelAdmin):
 
 @admin.register(Application)
 class ApplicationAdmin(admin.ModelAdmin):
-    list_display = ('description', 'written_username', 'written_phone', 'vacancy', 'user')
-    readonly_fields = ('description',)
+    list_display = ('title', 'written_username', 'written_phone', 'vacancy', 'user')
+    readonly_fields = ('title', 'user')
 
-    def description(self, application):
-        return f'отклик пользователя {application.written_username} на "{application.vacancy}"'
+    @admin.display(description='Заголовок')
+    def title(self, application):
+        return f'{application.written_username} откликнулся на "{application.vacancy}"'
+
+    def save_model(self, request, application, form, change):
+        if not change:
+            application.user = request.user
+        application.save()
 
 
 @admin.register(Specialty)
