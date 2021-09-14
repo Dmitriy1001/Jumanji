@@ -18,8 +18,12 @@ urlpatterns = [
     path('mycompany/letsstart/', views.mycompany_letsstart),
     path('mycompany/create/', views.mycompany_create, name='mycompany_create'),
     path('mycompany/', views.mycompany, name='mycompany'),
-    path('mycompany/vacancies/', views.my_vacancies),
-    path('mycompany/vacancies/create/', views.my_vacancies_create),
-    path('mycompany/vacancies/<int:vacancy_id>/', views.my_vacancy_detail),
+    path('mycompany/vacancies/', views.my_vacancies, name='mycompany_vacancies'),
+    path('mycompany/vacancies/create/', views.my_vacancies_create, name='my_vacancies_create'),
+    path(
+        'mycompany/vacancies/<int:vacancy_id>/',
+        views.my_vacancy_detail,
+        name='my_vacancy_detail',
+    ),
 
 ]

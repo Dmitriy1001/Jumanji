@@ -1,9 +1,11 @@
+from datetime import date
+
 from django.contrib import messages
 from django.db.models import Count
 from django.http import Http404
 from django.shortcuts import render, redirect
 
-from .forms import ApplicationForm, CompanyForm
+from .forms import ApplicationForm, CompanyForm, VacancyForm
 from .models import Vacancy, Specialty, Company
 
 
@@ -100,7 +102,7 @@ def mycompany(request):
     if request.method == 'POST':
         form = CompanyForm(request.POST, request.FILES, instance=company)
         if form.is_valid():
-            company = form.save()
+            form.save()
             messages.success(request, 'Информация о компании обновлена')
             return redirect('mycompany')
     else:
@@ -112,15 +114,43 @@ def mycompany(request):
 
 
 def my_vacancies(request):
-    return render(request, 'catalog/my_vacancies.html')
+    user = request.user
+    vacancies = Vacancy.objects.filter(company__owner=user).select_related('specialty', 'company')
+    return render(request, 'catalog/my_vacancies.html', {'vacancies': vacancies})
 
 
 def my_vacancies_create(request):
-    return render(request, 'catalog/my_vacancies_create.html')
+    if request.method == 'POST':
+        form = VacancyForm(request.POST)
+        if form.is_valid():
+            vacancy = form.save(commit=False)
+            vacancy.company = request.user.company
+            vacancy.published_at = date.today()
+            vacancy.save()
+            messages.success(request, 'Вакансия создана')
+            return redirect('my_vacancy_detail', vacancy.id)
+    else:
+        form = VacancyForm()
+    msgs = [msg.message for msg in request._messages]
+    msg = msgs[0] if msgs else ''
+    return render(request, 'catalog/my_vacancies_create.html', {'form': form, 'msg': msg})
 
 
 def my_vacancy_detail(request, vacancy_id):
-    return render(request, 'catalog/my_vacancy_detail.html')
+    vacancy = Vacancy.objects.get(id=vacancy_id)
+    specialty = vacancy.specialty
+    if request.method == 'POST':
+        form = VacancyForm(request.POST, instance=vacancy)
+        if form.is_valid():
+            vacancy = form.save()
+            messages.success(request, 'Информация о вакансии обновлена')
+            return redirect('my_vacancy_detail', vacancy_id)
+    else:
+        form = VacancyForm(instance=vacancy)
+    msgs = [msg.message for msg in request._messages]
+    msg = msgs[0] if msgs else ''
+    context = {'form': form, 'vacancy': vacancy, 'specialty': specialty, 'msg': msg}
+    return render(request, 'catalog/my_vacancy_detail.html', context)
 
 
 
