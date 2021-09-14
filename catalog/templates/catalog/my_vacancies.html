@@ -20,7 +20,9 @@
 
             <section class="tab-pane fade show active">
               <h2 class="h4 pt-2 pb-3">Вакансии</h2>
-              {% if not vacancies %}
+              {% if not company %}
+                <p class="alert alert-info" role="alert">Сначала надо создать компанию</p>
+              {% elif not vacancies %}
                 <p class="alert alert-info" role="alert">У вас пока нет вакансий, но вы можете создать первую</p>
               {% endif %}
 
@@ -45,9 +47,11 @@
 
             </section>
             <br>
-            <div class="form-group">
-              <a href="{% url 'my_vacancies_create' %}" class="btn btn-info">Добавить вакансию</a>
-            </div>
+            {% if company %}
+              <div class="form-group">
+                <a href="{% url 'my_vacancies_create' %}" class="btn btn-info">Добавить вакансию</a>
+              </div>
+            {% endif %}
 
           </div>
         </div>

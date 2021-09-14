@@ -4,14 +4,23 @@
         <p class="h5 mt-3 font-weight-normal">Отозваться на вакансию</p>
 
         <div class="form-group">
+            {% if form.written_username.errors %}
+                <div class="alert alert-danger">{{form.written_username.errors}}</div>
+            {% endif %}
             <label class="mb-1 mt-2" for="userName">Вас зовут</label>
             <input class="form-control" name="written_username" type="text" placeholder="" id="userName">
         </div>
         <div class="form-group">
+            {% if form.written_phone.errors %}
+                <div class="alert alert-danger">{{form.written_phone.errors}}</div>
+            {% endif %}
             <label class="mb-1" for="userPhone">Ваш телефон</label>
             <input class="form-control" name="written_phone" type="tel" placeholder="" id="userPhone">
         </div>
         <div class="form-group">
+            {% if form.written_cover_letter.errors %}
+                <div class="alert alert-danger">{{form.written_cover_letter.errors}}</div>
+            {% endif %}
             <label class="mb-1" for="userMsg" >Сопроводительное письмо</label>
             <textarea class="form-control" name="written_cover_letter" rows="8" id="userMsg"></textarea>
         </div>
