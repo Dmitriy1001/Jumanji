@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.conf import settings
 
 
 class Vacancy(models.Model):
@@ -34,7 +35,7 @@ class Vacancy(models.Model):
 class Company(models.Model):
     name = models.CharField(unique=True, max_length=255, verbose_name='Название')
     location = models.CharField(max_length=255, verbose_name='Город')
-    logo = models.ImageField(upload_to='company_images', verbose_name='Логотипчик')
+    logo = models.ImageField(upload_to=settings.MEDIA_COMPANY_IMAGE_DIR, verbose_name='Логотипчик')
     description = models.TextField(verbose_name='Информация о компании')
     employee_count = models.PositiveIntegerField(verbose_name='Количество сотрудников')
     owner = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Владелец')
@@ -50,7 +51,7 @@ class Company(models.Model):
 class Specialty(models.Model):
     code = models.SlugField(unique=True, verbose_name='Код')
     title = models.CharField(unique=True, max_length=255, verbose_name='Название')
-    picture = models.ImageField(upload_to='speciality_images', verbose_name='Картинка')
+    picture = models.ImageField(upload_to=settings.MEDIA_SPECIALITY_IMAGE_DIR, verbose_name='Картинка')
 
     class Meta:
         verbose_name = 'специализация'

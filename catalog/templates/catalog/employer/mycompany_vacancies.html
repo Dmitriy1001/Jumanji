@@ -21,7 +21,9 @@
             <section class="tab-pane fade show active">
               <h2 class="h4 pt-2 pb-3">Вакансии</h2>
               {% if not company %}
-                <p class="alert alert-info" role="alert">Сначала надо создать компанию</p>
+                <p class="alert alert-info" role="alert">
+                  Сначала надо <a href="{% url 'mycompany_create' %}">создать компанию</a>
+                </p>
               {% elif not vacancies %}
                 <p class="alert alert-info" role="alert">У вас пока нет вакансий, но вы можете создать первую</p>
               {% endif %}
