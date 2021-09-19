@@ -1,6 +1,14 @@
 from django.shortcuts import render
 
 
+def handler403(request, exception):
+    title = 'Доступ запрещен'
+    try:
+        msg = exception.args[0]
+    except IndexError:
+        msg = 'У вас недостаточно прав для доступа к данной странице.'
+    return render(request, 'page403.html', {'title': title, 'msg': msg})
+
 def handler404(request, exception):
     title = 'Страница не найдена'
     msg = exception.args[0]

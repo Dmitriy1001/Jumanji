@@ -19,8 +19,9 @@ from django.contrib import admin
 from django.contrib.auth.views import LogoutView
 from django.urls import path, include
 
-from . import handlers
 from accounts import views as account_views
+from . import handlers
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -36,5 +37,6 @@ if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
+handler403 = handlers.handler403
 handler404 = handlers.handler404
 handler500 = handlers.handler500
