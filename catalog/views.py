@@ -1,91 +1,107 @@
 from datetime import date
 
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
-
+from django.core.exceptions import PermissionDenied
 from django.db.models import Count
 from django.http import Http404
 from django.shortcuts import render, redirect
 from django.views.generic import CreateView, TemplateView, UpdateView, ListView, DetailView
-from django.utils.decorators import method_decorator
 
+from .decorators import has_not_company, has_company, custom_login_required
 from .forms import ApplicationForm, CompanyForm, VacancyForm
 from .models import Vacancy, Specialty, Company
-from .decorators import has_not_company, has_company
 
 
 # JOB SEEKER
 
 
-def index(request):
-    context = {
-        'specialties': Specialty.objects.annotate(vacancies_count=Count('vacancies')),
-        'companies': Company.objects.annotate(vacancies_count=Count('vacancies')),
-    }
-    return render(request, 'catalog/index.html', context)
+class Index(TemplateView):
+    template_name = 'catalog/index.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['specialties'] = Specialty.objects.annotate(vacancies_count=Count('vacancies'))
+        context['companies'] = Company.objects.annotate(vacancies_count=Count('vacancies'))
+        return context
 
 
-def vacancies_list(request):
-    context = {
-        'vacancies_category': 'Все вакансии',
-        'vacancies': Vacancy.objects.select_related('company').select_related('specialty'),
-    }
-    return render(request, 'catalog/job_seeker/vacancies_list.html', context)
+class VacancyList(ListView):
+    queryset = Vacancy.objects.select_related('company', 'specialty')
+    context_object_name = 'vacancies'
+    template_name = 'catalog/job_seeker/vacancies_list.html'
+    extra_context = {'vacancies_category': 'Все вакансии'}
 
 
-def specialty_vacancies_list(request, specialty_code):
-    try:
-        specialty = Specialty.objects.get(code=specialty_code)
-    except Specialty.DoesNotExist:
-        raise Http404('Рубрика не найдена')
-    context = {
-        'vacancies_category': specialty.title,
-        'vacancies': specialty.vacancies.select_related('specialty').select_related('company'),
-    }
-    return render(request, 'catalog/job_seeker/vacancies_list.html', context)
+class SpecialtyVacancyList(VacancyList):
+    def get_queryset(self):
+        try:
+            self.kwargs['specialty'] = (
+                Specialty.objects.get(code=self.kwargs['specialty_code'])
+            )
+        except Specialty.DoesNotExist:
+            raise Http404('Рубрика не найдена')
+        return self.kwargs['specialty'].vacancies.select_related('specialty', 'company')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['vacancies_category'] = self.kwargs['specialty'].title
+        return context
 
 
-def company_detail(request, company_id):
-    try:
-        company = Company.objects.get(id=company_id)
-    except Company.DoesNotExist:
-        raise Http404('Компания не найдена')
-    context = {
-        'company': company,
-        'vacancies': company.vacancies.select_related('specialty').select_related('company'),
-    }
-    return render(request, 'catalog/job_seeker/company_detail.html', context)
+class CompanyVacancyList(VacancyList):
+    def get_queryset(self):
+        try:
+            self.kwargs['company'] = Company.objects.get(id=self.kwargs['company_id'])
+        except Company.DoesNotExist:
+            raise Http404('Компания не найдена')
+        return self.kwargs['company'].vacancies.select_related('specialty', 'company')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['company'] = self.kwargs['company']
+        context['vacancies_category'] = self.kwargs['company'].name
+        return context
 
 
-def vacancy_detail(request, vacancy_id):
-    try:
-        vacancy = (
-            Vacancy.objects.select_related('specialty').select_related('company').get(id=vacancy_id)
-        )
-    except Vacancy.DoesNotExist:
-        raise Http404('Вакансия не найдена')
-    if request.method == 'POST':
-        form = ApplicationForm(request.POST)
+class VacancyDetail(DetailView):
+    form_class = ApplicationForm
+    template_name = 'catalog/job_seeker/vacancy_detail.html'
+
+    def get_object(self, queryset=None):
+        try:
+            vacancy = (
+                Vacancy.objects.select_related('specialty', 'company')
+                .get(id=self.kwargs['vacancy_id'])
+            )
+        except Vacancy.DoesNotExist:
+            raise Http404('Вакансия не найдена')
+        self.kwargs['vacancy'] = vacancy
+        return vacancy
+
+    @custom_login_required
+    def post(self, request, **kwargs):
+        vacancy_id = kwargs['vacancy_id']
+        form = self.form_class(request.POST)
         if form.is_valid():
-            application = form.save(commit=False)
-            application.vacancy = vacancy
-            application.user = request.user
-            application.save()
+            new_application = form.save(commit=False)
+            new_application.vacancy = self.get_object()
+            new_application.user = request.user
+            new_application.save()
             messages.success(request, f'Отклик на вакансию "{vacancy_id}" отправлен')
             return redirect('vacancy_send', vacancy_id)
-    else:
-        form = ApplicationForm()
-    return render(request, 'catalog/job_seeker/vacancy_detail.html', {'vacancy': vacancy, 'form': form})
 
 
-@login_required
-def vacancy_send(request, vacancy_id):
-    msg = f'Отклик на вакансию "{vacancy_id}" отправлен'
-    if msg not in [msg.message for msg in request._messages]:
-        return redirect('vacancy_detail', vacancy_id)
-    return render(request, 'catalog/job_seeker/vacancy_send.html', {'vacancy_id': vacancy_id})
+class VacancySend(LoginRequiredMixin, TemplateView):
+    template_name = 'catalog/job_seeker/vacancy_send.html'
+
+    def dispatch(self, *args, **kwargs):
+        vacancy_id = kwargs['vacancy_id']
+        msg = f'Отклик на вакансию "{vacancy_id}" отправлен'
+        if msg not in [msg.message for msg in self.request._messages]:
+            return redirect('vacancy_detail', vacancy_id)
+        return super().dispatch(*args, **kwargs)
 
 
 # EMPLOYER
@@ -130,14 +146,14 @@ class MyCompany(LoginRequiredMixin, UpdateView):
 
     def post(self, request, *args, **kwargs):
         company = request.user.company
-        form = CompanyForm(request.POST, request.FILES, instance=company)
+        form = self.form_class(request.POST, request.FILES, instance=company)
         if form.is_valid():
             form.save()
             messages.success(request, 'Информация о компании обновлена')
             return redirect('mycompany')
 
 
-class MyCompanyVacancies(LoginRequiredMixin, ListView):
+class MyCompanyVacancyList(LoginRequiredMixin, ListView):
     model = Vacancy
     template_name = 'catalog/employer/mycompany_vacancies.html'
     context_object_name = 'vacancies'
@@ -161,7 +177,7 @@ class MyCompanyVacancies(LoginRequiredMixin, ListView):
 
 class MyCompanyVacancyCreate(LoginRequiredMixin, CreateView):
     form_class = VacancyForm
-    template_name = 'catalog/employer/mycompany_vacancies_create.html'
+    template_name = 'catalog/employer/mycompany_vacancy_create.html'
     extra_context = {'page': 'vacancies'}
     dispatch = has_company(lambda self, *args, **kwargs: super().dispatch(*args, **kwargs))
 
@@ -183,16 +199,16 @@ class MyCompanyVacancyDetail(LoginRequiredMixin, DetailView):
     template_name = 'catalog/employer/mycompany_vacancy_detail.html'
 
     def dispatch(self, *args, **kwargs):
-        # такая фильтрация нужна для того, чтобы нельзя было редактировать вакансии чужой компании
         try:
             kwargs['vacancy'] = (
-                Vacancy.objects.filter(id=kwargs['vacancy_id'], company__owner=self.request.user)
+                Vacancy.objects.prefetch_related('applications')
                 .select_related('specialty')
                 .annotate(applications_count=Count('applications'))
-                .prefetch_related('applications')
-            )[0]
-        except IndexError:
-            raise Http404('Вакансия не найдена')
+                .get(id=kwargs['vacancy_id'], company__owner=self.request.user)
+                # такая фильтрация нужна для того, чтобы нельзя было редактировать вакансии чужой компании
+            )
+        except Vacancy.DoesNotExist:
+            raise PermissionDenied('Вы не можете редактировать вакансии чужой компании.')
         return super().dispatch(*args, **kwargs)
 
     def get(self, request, *args, **kwargs):
@@ -207,13 +223,14 @@ class MyCompanyVacancyDetail(LoginRequiredMixin, DetailView):
         }
         return render(request, self.template_name, context)
 
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST, instance=kwargs['vacancy'])
+    def post(self, request, **kwargs):
+        vacancy = kwargs['vacancy']
+        form = self.form_class(request.POST, instance=vacancy)
         if form.is_valid():
             form.save()
             messages.success(request, 'Информация о вакансии обновлена')
             return redirect('mycompany_vacancy_detail', kwargs['vacancy_id'])
-        return render(request, self.template_name, {'form': form, 'vacancy': kwargs['vacancy']})
+        return render(request, self.template_name, {'form': form, 'vacancy': vacancy})
 
 
 
