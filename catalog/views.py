@@ -113,8 +113,8 @@ class MyCompanyLetsstart(LoginRequiredMixin, HasNotCompanyMixin, TemplateView):
 
 class MyCompanyCreate(LoginRequiredMixin, HasNotCompanyMixin, CreateView):
     form_class = CompanyForm
-    template_name = 'catalog/employer/mycompany_create.html'
-    extra_context = {'page': 'company'}
+    template_name = 'catalog/employer/mycompany.html'
+    extra_context = {'page': 'company', 'info': 'Создание компании'}
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST, request.FILES)
@@ -126,7 +126,7 @@ class MyCompanyCreate(LoginRequiredMixin, HasNotCompanyMixin, CreateView):
             return redirect('mycompany')
 
 
-class MyCompany(LoginRequiredMixin, HasCompanyMixin, UpdateView):
+class MyCompanyUpdate(LoginRequiredMixin, HasCompanyMixin, UpdateView):
     form_class = CompanyForm
     template_name = 'catalog/employer/mycompany.html'
 
@@ -134,7 +134,13 @@ class MyCompany(LoginRequiredMixin, HasCompanyMixin, UpdateView):
         form = self.form_class(instance=request.user.company)
         msgs = [msg.message for msg in request._messages]
         msg = msgs[0] if msgs else ''
-        return render(request, self.template_name, {'form': form, 'msg': msg, 'page': 'company'})
+        context = {
+            'form': form,
+            'msg': msg,
+            'page': 'company',
+            'info': 'Информация о компании'
+        }
+        return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
         company = request.user.company
@@ -147,7 +153,7 @@ class MyCompany(LoginRequiredMixin, HasCompanyMixin, UpdateView):
 
 class MyCompanyVacancyList(LoginRequiredMixin, ListView):
     model = Vacancy
-    template_name = 'catalog/employer/mycompany_vacancies.html'
+    template_name = 'catalog/employer/mycompany_vacancies_list.html'
     context_object_name = 'vacancies'
 
     def get_queryset(self):
@@ -169,8 +175,8 @@ class MyCompanyVacancyList(LoginRequiredMixin, ListView):
 
 class MyCompanyVacancyCreate(LoginRequiredMixin, HasCompanyMixin, CreateView):
     form_class = VacancyForm
-    template_name = 'catalog/employer/mycompany_vacancy_create.html'
-    extra_context = {'page': 'vacancies'}
+    template_name = 'catalog/employer/mycompany_vacancy.html'
+    extra_context = {'page': 'vacancies', 'title': 'Создание вакансии'}
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
@@ -183,11 +189,9 @@ class MyCompanyVacancyCreate(LoginRequiredMixin, HasCompanyMixin, CreateView):
             return redirect('mycompany_vacancy_detail', vacancy.id)
 
 
-class MyCompanyVacancyDetail(LoginRequiredMixin, DetailView):
-    model = Vacancy
-    pk_url_kwarg = 'vacancy_id'
+class MyCompanyVacancyUpdate(LoginRequiredMixin, UpdateView):
     form_class = VacancyForm
-    template_name = 'catalog/employer/mycompany_vacancy_detail.html'
+    template_name = 'catalog/employer/mycompany_vacancy.html'
 
     def get_object(self, queryset=None):
         vacancy_id = self.kwargs['vacancy_id']
@@ -213,6 +217,7 @@ class MyCompanyVacancyDetail(LoginRequiredMixin, DetailView):
             'vacancy': vacancy,
             'msg': msg,
             'page': 'vacancies',
+            'title': vacancy.title,
         }
         return render(request, self.template_name, context)
 
@@ -224,6 +229,3 @@ class MyCompanyVacancyDetail(LoginRequiredMixin, DetailView):
             messages.success(request, 'Информация о вакансии обновлена')
             return redirect('mycompany_vacancy_detail', kwargs['vacancy_id'])
         return render(request, self.template_name, {'form': form, 'vacancy': vacancy})
-
-
-

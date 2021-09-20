@@ -13,7 +13,7 @@
 
   <main class="container mt-3 pb-5">
     <div class="row mt-5">
-      {% include 'catalog/includes/mycompany_sidebar.html' %}
+      {% include 'catalog/employer/includes/mycompany_sidebar.html' %}
       <div class="col-12 col-lg-8">
         <div class="card">
           <div class="card-body px-4 pb-4">
@@ -36,19 +36,21 @@
                         <a href="{% url 'vacancy_detail' vacancy.id %}" class="mb-1">{{vacancy}}</a>
                         <p class="mb-1">
                           <span class="mr-4">{{vacancy.salary_max|intcomma}}</span>
-                          <a href="#" class="text-info">откликов {{vacancy.applications.all|length}}</a>
+                          <a href="{% url 'mycompany_vacancy_detail' vacancy.id %}#applications" class="text-info">
+                            откликов {{vacancy.applications.all|length}}
+                          </a>
                         </p>
                       </div>
                       <div class="col-6 col-lg-4 text-right">
-                        <a href="{% url 'my_vacancy_detail' vacancy.id %}" class="btn btn-outline-info">Изменить</a>
+                        <a href="{% url 'mycompany_vacancy_detail' vacancy.id %}" class="btn btn-outline-info">Изменить</a>
                       </div>
                     </div>
                   </div>
                 </div>
               {% endfor %}
-
             </section>
             <br>
+
             {% if company %}
               <div class="form-group">
                 <a href="{% url 'my_vacancies_create' %}" class="btn btn-info">Добавить вакансию</a>

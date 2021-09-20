@@ -36,7 +36,7 @@
           </div>
 
         {% if user.is_authenticated %}
-          {% include 'catalog/includes/vacancy_reply_form.html' %}
+          {% include 'catalog/job_seeker/includes/vacancy_reply_form.html' %}
         {% else %}
           <div class="mt-4 text-center">
             <p><a href="{% url 'login' %}" target="_blank">Авторизируйтесь</a>, чтобы стала доступна форма отклика на вакансию</p>
