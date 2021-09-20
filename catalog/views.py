@@ -1,15 +1,16 @@
 from datetime import date
 
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
 from django.http import Http404
 from django.shortcuts import render, redirect
+from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, TemplateView, UpdateView, ListView, DetailView
 
-from .decorators import has_not_company, has_company, custom_login_required
+from .mixins import *
 from .forms import ApplicationForm, CompanyForm, VacancyForm
 from .models import Vacancy, Specialty, Company
 
@@ -77,10 +78,9 @@ class VacancyDetail(DetailView):
             )
         except Vacancy.DoesNotExist:
             raise Http404('Вакансия не найдена')
-        self.kwargs['vacancy'] = vacancy
         return vacancy
 
-    @custom_login_required
+    @method_decorator(login_required)
     def post(self, request, **kwargs):
         vacancy_id = kwargs['vacancy_id']
         form = self.form_class(request.POST)
@@ -107,21 +107,14 @@ class VacancySend(LoginRequiredMixin, TemplateView):
 # EMPLOYER
 
 
-class MyCompanyLetsstart(LoginRequiredMixin, TemplateView):
+class MyCompanyLetsstart(LoginRequiredMixin, HasNotCompanyMixin, TemplateView):
     template_name = 'catalog/employer/mycompany_letsstart.html'
 
-    # класс отрабатывает только, если у юзера еще нет компании(кастомный декоратор)
-    # в следующих классах dispatch прописан в одну строчку, лямбда функцией
-    @has_not_company
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
 
-
-class MyCompanyCreate(LoginRequiredMixin, CreateView):
+class MyCompanyCreate(LoginRequiredMixin, HasNotCompanyMixin, CreateView):
     form_class = CompanyForm
     template_name = 'catalog/employer/mycompany_create.html'
     extra_context = {'page': 'company'}
-    dispatch = has_not_company(lambda self, *args, **kwargs: super().dispatch(*args, **kwargs))
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST, request.FILES)
@@ -133,10 +126,9 @@ class MyCompanyCreate(LoginRequiredMixin, CreateView):
             return redirect('mycompany')
 
 
-class MyCompany(LoginRequiredMixin, UpdateView):
+class MyCompany(LoginRequiredMixin, HasCompanyMixin, UpdateView):
     form_class = CompanyForm
     template_name = 'catalog/employer/mycompany.html'
-    dispatch = has_company(lambda self, *args, **kwargs: super().dispatch(*args, **kwargs))
 
     def get(self, request, *args, **kwargs):
         form = self.form_class(instance=request.user.company)
@@ -175,11 +167,10 @@ class MyCompanyVacancyList(LoginRequiredMixin, ListView):
         return context
 
 
-class MyCompanyVacancyCreate(LoginRequiredMixin, CreateView):
+class MyCompanyVacancyCreate(LoginRequiredMixin, HasCompanyMixin, CreateView):
     form_class = VacancyForm
     template_name = 'catalog/employer/mycompany_vacancy_create.html'
     extra_context = {'page': 'vacancies'}
-    dispatch = has_company(lambda self, *args, **kwargs: super().dispatch(*args, **kwargs))
 
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
@@ -198,33 +189,35 @@ class MyCompanyVacancyDetail(LoginRequiredMixin, DetailView):
     form_class = VacancyForm
     template_name = 'catalog/employer/mycompany_vacancy_detail.html'
 
-    def dispatch(self, *args, **kwargs):
+    def get_object(self, queryset=None):
+        vacancy_id = self.kwargs['vacancy_id']
         try:
-            kwargs['vacancy'] = (
+            vacancy = (
                 Vacancy.objects.prefetch_related('applications')
                 .select_related('specialty')
                 .annotate(applications_count=Count('applications'))
-                .get(id=kwargs['vacancy_id'], company__owner=self.request.user)
+                .get(id=vacancy_id, company__owner=self.request.user)
                 # такая фильтрация нужна для того, чтобы нельзя было редактировать вакансии чужой компании
             )
         except Vacancy.DoesNotExist:
             raise PermissionDenied('Вы не можете редактировать вакансии чужой компании.')
-        return super().dispatch(*args, **kwargs)
+        return vacancy
 
     def get(self, request, *args, **kwargs):
-        form = self.form_class(instance=kwargs['vacancy'])
+        vacancy = self.get_object()
+        form = self.form_class(instance=vacancy)
         msgs = [msg.message for msg in request._messages]
         msg = msgs[0] if msgs else ''
         context = {
             'form': form,
-            'vacancy': kwargs['vacancy'],
+            'vacancy': vacancy,
             'msg': msg,
             'page': 'vacancies',
         }
         return render(request, self.template_name, context)
 
     def post(self, request, **kwargs):
-        vacancy = kwargs['vacancy']
+        vacancy = self.get_object()
         form = self.form_class(request.POST, instance=vacancy)
         if form.is_valid():
             form.save()
