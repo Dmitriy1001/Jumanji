@@ -12,19 +12,15 @@ urlpatterns = [
         views.SpecialtyVacancyList.as_view(),
         name='specialty_vacancies_list',
     ),
-    path('companies/<int:company_id>/', views.CompanyVacancyList.as_view(), name='company_detail'),
+    path('companies/<int:company_id>/', views.CompanyVacancyList.as_view(), name='company_vacancies_list'),
     path('vacancies/<int:vacancy_id>/', views.VacancyDetail.as_view(), name='vacancy_detail'),
     path('vacancies/<int:vacancy_id>/send/', views.VacancySend.as_view(), name='vacancy_send'),
 
     # EMPLOYER
     path('mycompany/letsstart/', views.MyCompanyLetsstart.as_view(), name='mycompany_letsstart'),
     path('mycompany/create/', views.MyCompanyCreate.as_view(), name='mycompany_create'),
-    path('mycompany/', views.MyCompanyUpdate.as_view(), name='mycompany'),
-    path('mycompany/vacancies/', views.MyCompanyVacancyList.as_view(), name='mycompany_vacancies'),
-    path('mycompany/vacancies/create/', views.MyCompanyVacancyCreate.as_view(), name='my_vacancies_create'),
-    path(
-        'mycompany/vacancies/<int:vacancy_id>/',
-        views.MyCompanyVacancyUpdate.as_view(),
-        name='mycompany_vacancy_detail',
-    ),
+    path('mycompany/', views.MyCompanyUpdate.as_view(), name='mycompany_update'),
+    path('mycompany/vacancies/', views.MyCompanyVacancyList.as_view(), name='mycompany_vacancies_list'),
+    path('mycompany/vacancies/create/', views.MyCompanyVacancyCreate.as_view(), name='mycompany_vacancy_create'),
+    path('mycompany/vacancies/<int:vacancy_id>/', views.MyCompanyVacancyUpdate.as_view(), name='mycompany_vacancy_update')
 ]
