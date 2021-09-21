@@ -83,14 +83,17 @@ class VacancyDetail(DetailView):
     @method_decorator(login_required)
     def post(self, request, **kwargs):
         vacancy_id = kwargs['vacancy_id']
+        vacancy = self.get_object()
         form = self.form_class(request.POST)
         if form.is_valid():
             new_application = form.save(commit=False)
-            new_application.vacancy = self.get_object()
+            new_application.vacancy = vacancy
             new_application.user = request.user
             new_application.save()
             messages.success(request, f'Отклик на вакансию "{vacancy_id}" отправлен')
             return redirect('vacancy_send', vacancy_id)
+        context = {'form': form, 'vacancy': vacancy}
+        return render(request, self.template_name, context)
 
 
 class VacancySend(LoginRequiredMixin, TemplateView):
@@ -123,23 +126,24 @@ class MyCompanyCreate(LoginRequiredMixin, HasNotCompanyMixin, CreateView):
             new_company.owner = request.user
             new_company.save()
             messages.success(request, 'Компания создана')
-            return redirect('mycompany')
+            return redirect('mycompany_update')
+        context = self.extra_context
+        context['form'] = form
+        return render(request, self.template_name, context)
 
 
 class MyCompanyUpdate(LoginRequiredMixin, HasCompanyMixin, UpdateView):
     form_class = CompanyForm
     template_name = 'catalog/employer/mycompany.html'
+    extra_context = {'page': 'company', 'info': 'Информация о компании'}
 
     def get(self, request, *args, **kwargs):
         form = self.form_class(instance=request.user.company)
         msgs = [msg.message for msg in request._messages]
         msg = msgs[0] if msgs else ''
-        context = {
-            'form': form,
-            'msg': msg,
-            'page': 'company',
-            'info': 'Информация о компании'
-        }
+        context = self.extra_context
+        context['form'] = form
+        context['msg'] = msg
         return render(request, self.template_name, context)
 
     def post(self, request, *args, **kwargs):
@@ -148,7 +152,10 @@ class MyCompanyUpdate(LoginRequiredMixin, HasCompanyMixin, UpdateView):
         if form.is_valid():
             form.save()
             messages.success(request, 'Информация о компании обновлена')
-            return redirect('mycompany')
+            return redirect('mycompany_update')
+        context = self.extra_context
+        context['form'] = form
+        return render(request, self.template_name, context)
 
 
 class MyCompanyVacancyList(LoginRequiredMixin, ListView):
@@ -178,6 +185,12 @@ class MyCompanyVacancyCreate(LoginRequiredMixin, HasCompanyMixin, CreateView):
     template_name = 'catalog/employer/mycompany_vacancy.html'
     extra_context = {'page': 'vacancies', 'title': 'Создание вакансии'}
 
+    def get(self, request, *args, **kwargs):
+        form = self.form_class()
+        context = self.extra_context
+        context['form'] = form
+        return render(request, self.template_name, context)
+
     def post(self, request, *args, **kwargs):
         form = self.form_class(request.POST)
         if form.is_valid():
@@ -186,7 +199,11 @@ class MyCompanyVacancyCreate(LoginRequiredMixin, HasCompanyMixin, CreateView):
             vacancy.published_at = date.today()
             vacancy.save()
             messages.success(request, 'Вакансия создана')
-            return redirect('mycompany_vacancy_detail', vacancy.id)
+            return redirect('mycompany_vacancy_update', vacancy.id)
+        #print(form.cleaned_data)
+        context = self.extra_context
+        context['form'] = form
+        return render(request, self.template_name, context)
 
 
 class MyCompanyVacancyUpdate(LoginRequiredMixin, UpdateView):
@@ -227,5 +244,11 @@ class MyCompanyVacancyUpdate(LoginRequiredMixin, UpdateView):
         if form.is_valid():
             form.save()
             messages.success(request, 'Информация о вакансии обновлена')
-            return redirect('mycompany_vacancy_detail', kwargs['vacancy_id'])
-        return render(request, self.template_name, {'form': form, 'vacancy': vacancy})
+            return redirect('mycompany_vacancy_update', kwargs['vacancy_id'])
+        context = {
+            'form': form,
+            'vacancy': vacancy,
+            'page': 'vacancies',
+            'title': vacancy.title,
+        }
+        return render(request, self.template_name, context)
