@@ -7,7 +7,15 @@
   <main class="container mt-3">
     <section>
       <h1 class="h1 text-center mx-auto mt-4 pt-5" style="font-size: 70px;"><strong>{{vacancies_category}}</strong></h1>
-      <p class="text-center pt-1">{{vacancies|length|ending:'вакансия'}}</p>
+      {% if company %}
+        <p class="text-center pt-1">
+          <i>{{company.description}}</i><br><br>
+          Компания, {{company.location}}, {{vacancies|length|ending:'вакансия'}}
+        </p>
+      {% else %}
+        <p class="text-center pt-1">{{vacancies|length|ending:'вакансия'}}</p>
+      {% endif %}
+
       {% include 'catalog/job_seeker/includes/vacancies.html' %}
     </section>
   </main>

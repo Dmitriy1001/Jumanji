@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-
 {% load humanize %}
 
 {% block title %}Вакансии компании | {{block.super}}{% endblock %}
@@ -36,13 +35,13 @@
                         <a href="{% url 'vacancy_detail' vacancy.id %}" class="mb-1">{{vacancy}}</a>
                         <p class="mb-1">
                           <span class="mr-4">{{vacancy.salary_max|intcomma}}</span>
-                          <a href="{% url 'mycompany_vacancy_detail' vacancy.id %}#applications" class="text-info">
-                            откликов {{vacancy.applications.all|length}}
+                          <a href="{% url 'mycompany_vacancy_update' vacancy.id %}#applications" class="text-info">
+                            откликов {{vacancy.applications_count}}
                           </a>
                         </p>
                       </div>
                       <div class="col-6 col-lg-4 text-right">
-                        <a href="{% url 'mycompany_vacancy_detail' vacancy.id %}" class="btn btn-outline-info">Изменить</a>
+                        <a href="{% url 'mycompany_vacancy_update' vacancy.id %}" class="btn btn-outline-info">Изменить</a>
                       </div>
                     </div>
                   </div>
@@ -53,7 +52,7 @@
 
             {% if company %}
               <div class="form-group">
-                <a href="{% url 'my_vacancies_create' %}" class="btn btn-info">Добавить вакансию</a>
+                <a href="{% url 'mycompany_vacancy_create' %}" class="btn btn-info">Добавить вакансию</a>
               </div>
             {% endif %}
 

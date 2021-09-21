@@ -4,24 +4,35 @@
     <div class="col-12 col-md-6">
       <div class="form-group pb-2">
         {% if form.title.errors %}
-        <div class="alert alert-danger">{{form.title.errors}}</div>
+          <div class="alert alert-danger">{{form.title.errors}}</div>
         {% endif %}
         <label class="mb-2 text-dark" for="vacancyTitle">Название вакансии</label>
-        <input class="form-control" name="title" type="text" value="" id="vacancyTitle">
+        <input class="form-control" name="title" type="text" value="{{form.data.title}}" id="vacancyTitle">
       </div>
     </div>
 
     <div class="col-12 col-md-6">
       <div class="form-group pb-2">
         {% if form.specialty.errors %}
-        <div class="alert alert-danger">{{form.specialty.errors}}</div>
+          <div class="alert alert-danger">{{form.specialty.errors}}</div>
         {% endif %}
         <label class="mb-2 text-dark" for="userSpecialization">Специализация</label>
         <select class="custom-select mr-sm-2" name="specialty" id="userSpecialization">
-          <option selected>---</option>
-          {% for specialty in form.specialty.field.choices.queryset %}
-          <option value="{{specialty.id}}">{{specialty.title}}</option>
-          {% endfor %}
+
+          {% if form.cleaned_data.specialty %}
+            <option selected value="{{form.data.specialty}}">{{form.cleaned_data.specialty}}</option>
+            {% for specialty in form.specialty.field.choices.queryset %}
+              {% if specialty.id != form.cleaned_data.specialty.id %}
+                <option value="{{specialty.id}}">{{specialty.title}}</option>
+              {% endif %}
+            {% endfor %}
+          {% else %}
+            <option selected>---</option>
+            {% for specialty in form.specialty.field.choices.queryset %}
+              <option value="{{specialty.id}}">{{specialty.title}}</option>
+            {% endfor %}
+          {% endif %}
+
         </select>
       </div>
     </div>
@@ -31,41 +42,41 @@
     <div class="col-12 col-md-6">
       <div class="form-group pb-2">
         {% if form.salary_min.errors %}
-        <div class="alert alert-danger">{{form.salary_min.errors}}</div>
+          <div class="alert alert-danger">{{form.salary_min.errors}}</div>
         {% endif %}
         <label class="mb-2 text-dark" for="vacancySalaryMin">Зарплата от</label>
-        <input class="form-control" name="salary_min" type="text" value="" id="vacancySalaryMin">
+        <input class="form-control" name="salary_min" type="text" value="{{form.data.salary_min}}" id="vacancySalaryMin">
       </div>
     </div>
 
     <div class="col-12 col-md-6">
       <div class="form-group pb-2">
         {% if form.salary_max.errors %}
-        <div class="alert alert-danger">{{form.salary_max.errors}}</div>
+          <div class="alert alert-danger">{{form.salary_max.errors}}</div>
         {% endif %}
         <label class="mb-2" for="vacancySalaryMax">Зарплата до</label>
-        <input class="form-control" name="salary_max" type="text" value="" id="vacancySalaryMax">
+        <input class="form-control" name="salary_max" type="text" value="{{form.data.salary_max}}" id="vacancySalaryMax">
       </div>
     </div>
   </div>
 
   <div class="form-group pb-2">
     {% if form.skills.errors %}
-    <div class="alert alert-danger">{{form.skills.errors}}</div>
+      <div class="alert alert-danger">{{form.skills.errors}}</div>
     {% endif %}
     <label class="mb-2 text-dark" for="vacancySkills">Требуемые навыки</label>
-    <textarea class="form-control" name="skills" rows="3" id="vacancySkills" style="color:#000;"></textarea>
+    <textarea class="form-control" name="skills" rows="3" id="vacancySkills" style="color:#000;">{{form.data.skills}}</textarea>
   </div>
 
   <div class="form-group pb-2">
     {% if form.description.errors %}
-    <div class="alert alert-danger">{{form.description.errors}}</div>
+     <div class="alert alert-danger">{{form.description.errors}}</div>
     {% endif %}
     <label class="mb-2 text-dark" for="vacancyDescription">Описание вакансии</label>
-    <textarea class="form-control" name="description" rows="13" id="vacancyDescription" style="color:#000;"></textarea>
+    <textarea class="form-control" name="description" rows="13" id="vacancyDescription" style="color:#000;">{{form.data.description}}</textarea>
   </div>
   <div class="form-group">
-    <input type="submit" class="btn btn-info" value="Сохранить">
+    <input type="submit" class="btn btn-info" value="Создать">
   </div>
 </form>
 
