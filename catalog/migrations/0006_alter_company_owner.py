@@ -16,6 +16,10 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='company',
             name='owner',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to='auth.user', verbose_name='Владелец'),
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE,
+                to='auth.user',
+                verbose_name='Владелец',
+            ),
         ),
     ]

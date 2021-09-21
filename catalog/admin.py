@@ -32,6 +32,3 @@ class ApplicationAdmin(admin.ModelAdmin):
 class SpecialtyAdmin(admin.ModelAdmin):
     list_display = ('title', 'code')
     readonly_fields = ('title', 'code')
-
-
-

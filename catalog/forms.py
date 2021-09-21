@@ -26,7 +26,7 @@ class CompanyForm(forms.ModelForm):
 
 class VacancyForm(forms.ModelForm):
     specialty = forms.ModelChoiceField(queryset=Specialty.objects.all())
+
     class Meta:
         model = Vacancy
         fields = ('title', 'specialty', 'salary_min', 'salary_max', 'skills', 'description')
-

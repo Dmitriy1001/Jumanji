@@ -16,7 +16,12 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='company',
             name='owner',
-            field=models.OneToOneField(null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name='Владелец'),
+            field=models.OneToOneField(
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to=settings.AUTH_USER_MODEL,
+                verbose_name='Владелец',
+            ),
         ),
         migrations.AlterField(
             model_name='company',
@@ -35,8 +40,24 @@ class Migration(migrations.Migration):
                 ('written_username', models.CharField(max_length=255, verbose_name='Имя')),
                 ('written_phone', models.CharField(max_length=255, verbose_name='Телефон')),
                 ('written_cover_letter', models.TextField(verbose_name='Сопроводительное письмо')),
-                ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='applications', to=settings.AUTH_USER_MODEL, verbose_name='Пользователь')),
-                ('vacancy', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='applications', to='catalog.vacancy', verbose_name='Вакансия')),
+                (
+                    'user',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='applications',
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name='Пользователь',
+                    ),
+                ),
+                (
+                    'vacancy',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='applications',
+                        to='catalog.vacancy',
+                        verbose_name='Вакансия',
+                    ),
+                ),
             ],
         ),
     ]

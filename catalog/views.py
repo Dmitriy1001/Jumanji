@@ -3,6 +3,7 @@ from datetime import date
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
 from django.db.models import Count
 from django.http import Http404
@@ -10,7 +11,7 @@ from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, TemplateView, UpdateView, ListView, DetailView
 
-from .mixins import *
+from .mixins import HasCompanyMixin, HasNotCompanyMixin
 from .forms import ApplicationForm, CompanyForm, VacancyForm
 from .models import Vacancy, Specialty, Company
 
@@ -200,7 +201,6 @@ class MyCompanyVacancyCreate(LoginRequiredMixin, HasCompanyMixin, CreateView):
             vacancy.save()
             messages.success(request, 'Вакансия создана')
             return redirect('mycompany_vacancy_update', vacancy.id)
-        #print(form.cleaned_data)
         context = self.extra_context
         context['form'] = form
         return render(request, self.template_name, context)

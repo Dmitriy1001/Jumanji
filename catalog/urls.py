@@ -22,5 +22,9 @@ urlpatterns = [
     path('mycompany/', views.MyCompanyUpdate.as_view(), name='mycompany_update'),
     path('mycompany/vacancies/', views.MyCompanyVacancyList.as_view(), name='mycompany_vacancies_list'),
     path('mycompany/vacancies/create/', views.MyCompanyVacancyCreate.as_view(), name='mycompany_vacancy_create'),
-    path('mycompany/vacancies/<int:vacancy_id>/', views.MyCompanyVacancyUpdate.as_view(), name='mycompany_vacancy_update')
+    path(
+        'mycompany/vacancies/<int:vacancy_id>/',
+        views.MyCompanyVacancyUpdate.as_view(),
+        name='mycompany_vacancy_update',
+    ),
 ]

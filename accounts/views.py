@@ -26,4 +26,3 @@ class RegisterUser(CreateView):
             return redirect('index')
         else:
             return super().dispatch(request, *args, **kwargs)
-
