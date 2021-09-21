@@ -15,25 +15,25 @@
       {% if form.username.errors %}
         <div class="alert alert-danger">{{form.username.errors}}</div>
       {% endif %}
-      <input type="text" name="username" id="inputLogin" class="form-control" required autofocus>
+      <input type="text" name="username" value="{{form.data.username}}" id="inputLogin" class="form-control" required autofocus>
       <label for="inputLogin"></label>
     </div>
 
     <div class=" form-label-group">
       <p class="text-muted">Имя</p>
-      <input type="text" name="first_name" id="inputName" class="form-control" required>
+      <input type="text" name="first_name" value="{{form.data.first_name}}" id="inputName" class="form-control" required>
       <label for="inputName"></label>
     </div>
 
     <div class=" form-label-group">
       <p class="text-muted">Фамилия</p>
-      <input type="text" name="last_name" id="inputSurname" class="form-control" required>
+      <input type="text" name="last_name" value="{{form.data.last_name}}" id="inputSurname" class="form-control" required>
       <label for="inputSurname"></label>
     </div>
 
     <div class="form-label-group">
       <p class="text-muted">Пароль</p>
-      <input type="password" name="password" id="inputPassword" class="form-control" required>
+      <input type="password" name="password" value="{{form.data.password}}" id="inputPassword" class="form-control" required>
       <label for="inputPassword"></label>
     </div>
 

@@ -7,7 +7,7 @@ class HasNotCompanyMixin:
     def dispatch(self, *args, **kwargs):
         try:
             self.request.user.company
-            return redirect('mycompany')
+            return redirect('mycompany_update')
         except User.company.RelatedObjectDoesNotExist:
             return super().dispatch(*args, **kwargs)
 

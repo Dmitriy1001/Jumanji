@@ -9,6 +9,7 @@ def handler403(request, exception):
         msg = 'У вас недостаточно прав для доступа к данной странице.'
     return render(request, 'page403.html', {'title': title, 'msg': msg})
 
+
 def handler404(request, exception):
     title = 'Страница не найдена'
     msg = exception.args[0]
