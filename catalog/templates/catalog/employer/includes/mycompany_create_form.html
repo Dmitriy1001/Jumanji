@@ -3,19 +3,16 @@
   <div class="row">
     <div class="col-12 col-md-6">
       <div class="form-group pb-2">
-        {% if form.name.errors %}
-          <div class="alert alert-danger">{{form.name.errors}}</div>
-        {% endif %}
         <label class="mb-2 text-dark" for="companyName">Название компании</label>
         <input class="form-control" name="name" value="{{form.data.name}}" type="text" id="companyName">
+        {% if form.name.errors %}
+          <div class="text-danger">{{form.name.errors}}</div>
+        {% endif %}
       </div>
     </div>
 
     <div class="col-12 col-md-6">
       <div class="form-group">
-        {% if form.logo.errors %}
-          <div class="alert alert-danger">{{form.logo.errors}}</div>
-        {% endif %}
         <label class="mb-2 text-dark" for="companyLogo">Логотип</label>
         <div class="row align-items-center">
           <div class="col-6">
@@ -27,6 +24,9 @@
             </div>
             <div class="custom-file" style="">
               <input type="file" name="logo" class="custom-file-input" id="inputGroupFile01">
+              {% if form.logo.errors %}
+                <div class="text-danger">{{form.logo.errors}}</div>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -37,31 +37,31 @@
   <div class="row">
     <div class="col-12 col-md-6">
       <div class="form-group pb-2">
-        {% if form.employee_count.errors %}
-          <div class="alert alert-danger">{{form.employee_count.errors}}</div>
-        {% endif %}
         <label class="mb-2 text-dark" for="companyTeam">Количество человек в компании</label>
         <input class="form-control" name="employee_count" value="{{form.data.employee_count}}" type="text" id="companyTeam">
+        {% if form.employee_count.errors %}
+          <div class="text-danger">{{form.employee_count.errors}}</div>
+        {% endif %}
       </div>
     </div>
 
     <div class="col-12 col-md-6">
       <div class="form-group pb-2">
-        {% if form.location.errors %}
-          <div class="alert alert-danger">{{form.location.errors}}</div>
-        {% endif %}
         <label class="mb-2 text-dark" for="companyLocation">География</label>
         <input class="form-control" name="location" value="{{form.data.location}}" type="text" id="companyLocation">
+        {% if form.location.errors %}
+          <div class="text-danger">{{form.location.errors}}</div>
+        {% endif %}
       </div>
     </div>
   </div>
 
   <div class="form-group pb-2">
-    {% if form.description.errors %}
-      <div class="alert alert-danger">{{form.description.errors}}</div>
-    {% endif %}
     <label class="mb-2 text-dark" for="companyInfo">Информация о&nbsp;компании</label>
     <textarea class="form-control" name="description" rows="4" id="companyInfo" style="color:#000;">{{form.data.description}}</textarea>
+    {% if form.description.errors %}
+      <div class="text-danger">{{form.description.errors}}</div>
+    {% endif %}
   </div>
   <div class="form-group">
     <input type="submit" class="btn btn-info" value="Создать">

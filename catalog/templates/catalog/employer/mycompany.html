@@ -22,11 +22,11 @@
               {% if msg %}
                 <p class="alert alert-info" role="alert">{{msg}}</p>
               {% endif %}
-            {% if info == 'Создание компании' %}
-              {% include 'catalog/employer/includes/mycompany_create_form.html' %}
-            {% elif info == 'Информация о компании' %}
-              {% include 'catalog/employer/includes/mycompany_update_form.html' %}
-            {% endif %}
+              {% if info == 'Создание компании' %}
+                {% include 'catalog/employer/includes/mycompany_create_form.html' %}
+              {% elif info == 'Информация о компании' %}
+                {% include 'catalog/employer/includes/mycompany_update_form.html' %}
+              {% endif %}
             </section>
             <!-- END Tab -->
 

@@ -19,13 +19,39 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('name', models.CharField(max_length=255, verbose_name='Имя')),
                 ('surname', models.CharField(max_length=255, verbose_name='Фамилия')),
-                ('status', models.CharField(choices=[('not_in_search', 'Не ищу работу'), ('consideration', 'Рассматриваю предложения'), ('in_search', 'Ищу работу')], max_length=255, verbose_name='Готовность к работе')),
+                (
+                    'status',
+                    models.CharField(
+                        choices=[
+                            ('not_in_search', 'Не ищу работу'),
+                            ('consideration', 'Рассматриваю предложения'),
+                            ('in_search', 'Ищу работу'),
+                        ],
+                        max_length=255,
+                        verbose_name='Готовность к работе',
+                    ),
+                ),
                 ('salary', models.PositiveIntegerField(verbose_name='Вознаграждение')),
                 ('education', models.TextField(verbose_name='Образование')),
                 ('experience', models.TextField(verbose_name='Опыт работы')),
                 ('portfolio', models.URLField(verbose_name='Портфолио')),
-                ('specialty', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='resumes', to='catalog.specialty', verbose_name='Специализация')),
-                ('user', models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL, verbose_name='Пользователь')),
+                (
+                    'specialty',
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name='resumes',
+                        to='catalog.specialty',
+                        verbose_name='Специализация',
+                    ),
+                ),
+                (
+                    'user',
+                    models.OneToOneField(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                        verbose_name='Пользователь',
+                    ),
+                ),
             ],
             options={
                 'verbose_name': 'резюме',

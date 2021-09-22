@@ -8,12 +8,13 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
 from django.http import Http404
 from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, TemplateView, UpdateView, ListView, DetailView
 
-from .mixins import HasCompanyMixin, HasNotCompanyMixin
-from .forms import ApplicationForm, CompanyForm, VacancyForm
-from .models import Vacancy, Specialty, Company
+from .mixins import HasCompanyMixin, HasNotCompanyMixin, HasNotResumeMixin, HasResumeMixin
+from .forms import ApplicationForm, CompanyForm, VacancyForm, ResumeForm
+from .models import Vacancy, Specialty, Company, Resume
 
 
 # JOB SEEKER
@@ -109,7 +110,6 @@ class VacancySend(LoginRequiredMixin, TemplateView):
 
 
 class Search(VacancyList):
-
     def get_queryset(self):
         query = self.request.GET.get('s')
         query = query.strip() if query else ''
@@ -125,6 +125,49 @@ class Search(VacancyList):
         query = self.request.GET.get('s')
         context['search_query'] = query if query else 'Ничего не найдено'
         context['vacancies_category'] = 'Поиск вакансий'
+        return context
+
+
+class MyResumeLetsstart(LoginRequiredMixin, HasNotResumeMixin, TemplateView):
+    template_name = 'catalog/employer/myresume.html'
+    extra_context = {'info': 'Начнем'}
+
+
+class MyResumeCreate(LoginRequiredMixin, HasNotResumeMixin, CreateView):
+    form_class = ResumeForm
+    template_name = 'catalog/employer/myresume.html'
+    extra_context = {'info': 'Создание резюме'}
+
+    def post(self, request, *args, **kwargs):
+        form = self.form_class(request.POST)
+        if form.is_valid():
+            new_resume = form.save(commit=False)
+            new_resume.user = request.user
+            new_resume.save()
+            messages.success(request, 'Резюме создано')
+            return redirect('myresume_update')
+        context = self.extra_context
+        context['form'] = form
+        return render(request, self.template_name, context)
+
+
+class MyResumeUpdate(LoginRequiredMixin, HasResumeMixin, UpdateView):
+    model = Resume
+    form_class = ResumeForm
+    template_name = 'catalog/employer/myresume.html'
+    success_url = reverse_lazy('myresume_update')
+
+    def get_object(self, queryset=None):
+        if self.request.method == 'POST':
+            messages.success(self.request, 'Резюме обновлено')
+        return self.request.user.resume
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data()
+        msgs = [msg.message for msg in self.request._messages]
+        msg = msgs[0] if msgs else ''
+        context['msg'] = msg
+        context['info'] = 'Мое резюме'
         return context
 
 

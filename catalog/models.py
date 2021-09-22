@@ -98,7 +98,7 @@ class Resume(models.Model):
             ('in_search', 'Ищу работу'),
         ],
         default='not_in_search',
-        verbose_name='Готовность к работе'
+        verbose_name='Готовность к работе',
     )
     salary = models.PositiveIntegerField(verbose_name='Вознаграждение')
     specialty = models.ForeignKey(
@@ -127,4 +127,4 @@ class Resume(models.Model):
         verbose_name_plural = 'резюме'
 
     def __str__(self):
-        return f'Резюме пользователя {user}'
+        return f'Резюме пользователя {self.user}'

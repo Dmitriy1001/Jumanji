@@ -13,11 +13,30 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='resume',
             name='grade',
-            field=models.CharField(choices=[('trainee', 'Стажер'), ('junior', 'Джуниор'), ('middle', 'Миддл'), ('senior', 'Синьор'), ('lead', 'Лид')], max_length=255, null=True, verbose_name='Квалификация'),
+            field=models.CharField(
+                choices=[
+                    ('trainee', 'Стажер'),
+                    ('junior', 'Джуниор'),
+                    ('middle', 'Миддл'),
+                    ('senior', 'Синьор'),
+                    ('lead', 'Лид'),
+                ],
+                max_length=255,
+                verbose_name='Квалификация',
+            ),
         ),
         migrations.AlterField(
             model_name='resume',
             name='status',
-            field=models.CharField(choices=[('not_in_search', 'Не ищу работу'), ('consideration', 'Рассматриваю предложения'), ('in_search', 'Ищу работу')], default='not_in_search', max_length=255, verbose_name='Готовность к работе'),
+            field=models.CharField(
+                choices=[
+                    ('not_in_search', 'Не ищу работу'),
+                    ('consideration', 'Рассматриваю предложения'),
+                    ('in_search', 'Ищу работу'),
+                ],
+                default='not_in_search',
+                max_length=255,
+                verbose_name='Готовность к работе',
+            ),
         ),
     ]

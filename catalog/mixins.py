@@ -19,3 +19,21 @@ class HasCompanyMixin:
             return super().dispatch(*args, **kwargs)
         except User.company.RelatedObjectDoesNotExist:
             return redirect('mycompany_letsstart')
+
+
+class HasNotResumeMixin:
+    def dispatch(self, *args, **kwargs):
+        try:
+            self.request.user.resume
+            return redirect('myresume_update')
+        except User.resume.RelatedObjectDoesNotExist:
+            return super().dispatch(*args, **kwargs)
+
+
+class HasResumeMixin:
+    def dispatch(self, *args, **kwargs):
+        try:
+            self.request.user.resume
+            return super().dispatch(*args, **kwargs)
+        except User.resume.RelatedObjectDoesNotExist:
+            return redirect('myresume_letsstart')

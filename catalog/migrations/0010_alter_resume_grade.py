@@ -13,6 +13,16 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='resume',
             name='grade',
-            field=models.CharField(choices=[('trainee', 'Стажер'), ('junior', 'Джуниор'), ('middle', 'Миддл'), ('senior', 'Синьор'), ('lead', 'Лид')], max_length=255, verbose_name='Квалификация'),
+            field=models.CharField(
+                choices=[
+                    ('trainee', 'Стажер'),
+                    ('junior', 'Джуниор'),
+                    ('middle', 'Миддл'),
+                    ('senior', 'Синьор'),
+                    ('lead', 'Лид'),
+                ],
+                max_length=255,
+                verbose_name='Квалификация',
+            ),
         ),
     ]

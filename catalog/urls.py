@@ -1,11 +1,12 @@
-from django.urls import path, re_path
+from django.urls import path
 
 from . import views
 
 
 urlpatterns = [
-    # JOB_SEEKER
     path('', views.Index.as_view(), name='index'),
+
+    # JOB_SEEKER
     path('vacancies/', views.VacancyList.as_view(), name='vacancies_list'),
     path(
         'vacancies/cat/<slug:specialty_code>/',
@@ -16,9 +17,9 @@ urlpatterns = [
     path('vacancies/<int:vacancy_id>/', views.VacancyDetail.as_view(), name='vacancy_detail'),
     path('vacancies/<int:vacancy_id>/send/', views.VacancySend.as_view(), name='vacancy_send'),
     path('search/', views.Search.as_view(), name='search'),
-    # path('myresume/letsstart/'),
-    # path('myresume/create/'),
-    # path('myresume/'),
+    path('myresume/letsstart/', views.MyResumeLetsstart.as_view(), name='myresume_letsstart'),
+    path('myresume/create/', views.MyResumeCreate.as_view(), name='myresume_create'),
+    path('myresume/', views.MyResumeUpdate.as_view(), name='myresume_update'),
 
     # EMPLOYER
     path('mycompany/letsstart/', views.MyCompanyLetsstart.as_view(), name='mycompany_letsstart'),
