@@ -1,17 +1,35 @@
 {% extends 'base.html' %}
 {% load catalog_filters %}
 
-{% block title %}{{vacancies_category}} | {{block.super}}{% endblock %}
+{% block title %}
+  {{vacancies_category}}{% if search_query and vacancies %} - "{{search_query}}"{% endif %} | {{block.super}}
+{% endblock %}
 
 {% block content %}
   <main class="container mt-3">
     <section>
-      <h1 class="h1 text-center mx-auto mt-4 pt-5" style="font-size: 70px;"><strong>{{vacancies_category}}</strong></h1>
-      {% if company %}
+      {% if not search_query %}
+        <h1 class="h1 text-center mx-auto mt-4 pt-5" style="font-size: 70px;"><strong>{{vacancies_category}}</strong></h1>
+      {% else %}
+        <h1 class="h1 text-center mt-5 mb-4">Поиск вакансий</h1>
+      {% endif %}
+
+      {% if search_query %}
+        {% include 'catalog/job_seeker/includes/search_form.html' %}
+        <p class="text-center pt-1">
+          {% if vacancies %}
+            Найдено {{vacancies|length|ending:'вакансия'}}
+          {% else %}
+            Ничего не найдено
+          {% endif %}
+        </p>
+
+      {% elif company %}
         <p class="text-center pt-1">
           <i>{{company.description}}</i><br><br>
           Компания, {{company.location}}, {{vacancies|length|ending:'вакансия'}}
         </p>
+
       {% else %}
         <p class="text-center pt-1">{{vacancies|length|ending:'вакансия'}}</p>
       {% endif %}

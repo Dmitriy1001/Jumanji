@@ -108,9 +108,7 @@ class VacancySend(LoginRequiredMixin, TemplateView):
         return super().dispatch(*args, **kwargs)
 
 
-class Search(ListView):
-    template_name = 'catalog/job_seeker/search.html'
-    context_object_name = 'vacancies'
+class Search(VacancyList):
 
     def get_queryset(self):
         query = self.request.GET.get('s')
@@ -124,7 +122,9 @@ class Search(ListView):
 
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
-        context['query'] = self.request.GET.get('s')
+        query = self.request.GET.get('s')
+        context['search_query'] = query if query else 'Ничего не найдено'
+        context['vacancies_category'] = 'Поиск вакансий'
         return context
 
 
