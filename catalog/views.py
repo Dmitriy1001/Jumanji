@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.models import User
 from django.core.exceptions import PermissionDenied
-from django.db.models import Count
+from django.db.models import Count, Q
 from django.http import Http404
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
@@ -106,6 +106,26 @@ class VacancySend(LoginRequiredMixin, TemplateView):
         if msg not in [msg.message for msg in self.request._messages]:
             return redirect('vacancy_detail', vacancy_id)
         return super().dispatch(*args, **kwargs)
+
+
+class Search(ListView):
+    template_name = 'catalog/job_seeker/search.html'
+    context_object_name = 'vacancies'
+
+    def get_queryset(self):
+        query = self.request.GET.get('s')
+        query = query.strip() if query else ''
+        if query:
+            return Vacancy.objects.select_related('company', 'specialty').filter(
+                Q(title__icontains=query) |
+                Q(skills__icontains=query) |
+                Q(description__icontains=query)
+            )
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context['query'] = self.request.GET.get('s')
+        return context
 
 
 # EMPLOYER

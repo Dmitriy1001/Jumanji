@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from . import views
 
@@ -15,6 +15,10 @@ urlpatterns = [
     path('companies/<int:company_id>/', views.CompanyVacancyList.as_view(), name='company_vacancies_list'),
     path('vacancies/<int:vacancy_id>/', views.VacancyDetail.as_view(), name='vacancy_detail'),
     path('vacancies/<int:vacancy_id>/send/', views.VacancySend.as_view(), name='vacancy_send'),
+    path('search/', views.Search.as_view(), name='search'),
+    # path('myresume/letsstart/'),
+    # path('myresume/create/'),
+    # path('myresume/'),
 
     # EMPLOYER
     path('mycompany/letsstart/', views.MyCompanyLetsstart.as_view(), name='mycompany_letsstart'),
