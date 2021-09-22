@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Vacancy, Company, Specialty, Application
+from .models import Vacancy, Company, Specialty, Application, Resume
 
 
 @admin.register(Vacancy)
@@ -32,3 +32,8 @@ class ApplicationAdmin(admin.ModelAdmin):
 class SpecialtyAdmin(admin.ModelAdmin):
     list_display = ('title', 'code')
     readonly_fields = ('title', 'code')
+
+
+@admin.register(Resume)
+class ResumeAdmin(admin.ModelAdmin):
+    pass

@@ -84,3 +84,47 @@ class Application(models.Model):
 
     def __str__(self):
         return f'{self.written_username} откликнулся на "{self.vacancy}"'
+
+
+class Resume(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Пользователь')
+    name = models.CharField(max_length=255, verbose_name='Имя')
+    surname = models.CharField(max_length=255, verbose_name='Фамилия')
+    status = models.CharField(
+        max_length=255,
+        choices=[
+            ('not_in_search', 'Не ищу работу'),
+            ('consideration', 'Рассматриваю предложения'),
+            ('in_search', 'Ищу работу'),
+        ],
+        default='not_in_search',
+        verbose_name='Готовность к работе'
+    )
+    salary = models.PositiveIntegerField(verbose_name='Вознаграждение')
+    specialty = models.ForeignKey(
+        Specialty,
+        related_name='resumes',
+        on_delete=models.CASCADE,
+        verbose_name='Специализация',
+    )
+    grade = models.CharField(
+        max_length=255,
+        choices=[
+            ('trainee', 'Стажер'),
+            ('junior', 'Джуниор'),
+            ('middle', 'Миддл'),
+            ('senior', 'Синьор'),
+            ('lead', 'Лид'),
+        ],
+        verbose_name='Квалификация',
+    )
+    education = models.TextField(verbose_name='Образование')
+    experience = models.TextField(verbose_name='Опыт работы')
+    portfolio = models.URLField(verbose_name='Портфолио')
+
+    class Meta:
+        verbose_name = 'резюме'
+        verbose_name_plural = 'резюме'
+
+    def __str__(self):
+        return f'Резюме пользователя {user}'
