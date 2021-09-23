@@ -8,7 +8,7 @@ from django.core.exceptions import PermissionDenied
 from django.db.models import Count, Q
 from django.http import Http404
 from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, TemplateView, UpdateView, ListView, DetailView
 
@@ -117,7 +117,7 @@ class Search(VacancyList):
             return Vacancy.objects.select_related('company', 'specialty').filter(
                 Q(title__icontains=query) |
                 Q(skills__icontains=query) |
-                Q(description__icontains=query)
+                Q(description__icontains=query),
             )
 
     def get_context_data(self, *args, **kwargs):
@@ -129,32 +129,32 @@ class Search(VacancyList):
 
 
 class MyResumeLetsstart(LoginRequiredMixin, HasNotResumeMixin, TemplateView):
-    template_name = 'catalog/employer/myresume.html'
+    template_name = 'catalog/job_seeker/myresume.html'
     extra_context = {'info': 'Начнем'}
 
 
 class MyResumeCreate(LoginRequiredMixin, HasNotResumeMixin, CreateView):
     form_class = ResumeForm
-    template_name = 'catalog/employer/myresume.html'
+    template_name = 'catalog/job_seeker/myresume.html'
     extra_context = {'info': 'Создание резюме'}
+    success_url = reverse_lazy('myresume_update')
 
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)
-        if form.is_valid():
-            new_resume = form.save(commit=False)
-            new_resume.user = request.user
-            new_resume.save()
-            messages.success(request, 'Резюме создано')
-            return redirect('myresume_update')
-        context = self.extra_context
-        context['form'] = form
-        return render(request, self.template_name, context)
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        messages.success(self.request, 'Резюме создано')
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        msgs = [msg.message for msg in self.request._messages]
+        context['msg'] = msgs[0] if msgs else ''
+        return context
 
 
 class MyResumeUpdate(LoginRequiredMixin, HasResumeMixin, UpdateView):
     model = Resume
     form_class = ResumeForm
-    template_name = 'catalog/employer/myresume.html'
+    template_name = 'catalog/job_seeker/myresume.html'
     success_url = reverse_lazy('myresume_update')
 
     def get_object(self, queryset=None):
@@ -163,7 +163,7 @@ class MyResumeUpdate(LoginRequiredMixin, HasResumeMixin, UpdateView):
         return self.request.user.resume
 
     def get_context_data(self, *args, **kwargs):
-        context = super().get_context_data()
+        context = super().get_context_data(*args, **kwargs)
         msgs = [msg.message for msg in self.request._messages]
         msg = msgs[0] if msgs else ''
         context['msg'] = msg
@@ -181,45 +181,40 @@ class MyCompanyLetsstart(LoginRequiredMixin, HasNotCompanyMixin, TemplateView):
 class MyCompanyCreate(LoginRequiredMixin, HasNotCompanyMixin, CreateView):
     form_class = CompanyForm
     template_name = 'catalog/employer/mycompany.html'
-    extra_context = {'page': 'company', 'info': 'Создание компании'}
+    success_url = reverse_lazy('mycompany_update')
 
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST, request.FILES)
-        if form.is_valid():
-            new_company = form.save(commit=False)
-            new_company.owner = request.user
-            new_company.save()
-            messages.success(request, 'Компания создана')
-            return redirect('mycompany_update')
-        context = self.extra_context
-        context['form'] = form
-        return render(request, self.template_name, context)
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        messages.success(self.request, 'Компания создана')
+        return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        msgs = [msg.message for msg in self.request._messages]
+        context['msg'] = msgs[0] if msgs else ''
+        context['page'] = 'company'
+        context['info'] = 'Создание компании'
+        return context
 
 
 class MyCompanyUpdate(LoginRequiredMixin, HasCompanyMixin, UpdateView):
+    model = Company
     form_class = CompanyForm
     template_name = 'catalog/employer/mycompany.html'
-    extra_context = {'page': 'company', 'info': 'Информация о компании'}
+    success_url = reverse_lazy('mycompany_update')
 
-    def get(self, request, *args, **kwargs):
-        form = self.form_class(instance=request.user.company)
-        msgs = [msg.message for msg in request._messages]
-        msg = msgs[0] if msgs else ''
-        context = self.extra_context
-        context['form'] = form
-        context['msg'] = msg
-        return render(request, self.template_name, context)
+    def get_object(self, queryset=None):
+        if self.request.method == 'POST':
+            messages.success(self.request, 'Информация о компании обновлена')
+        return self.request.user.company
 
-    def post(self, request, *args, **kwargs):
-        company = request.user.company
-        form = self.form_class(request.POST, request.FILES, instance=company)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Информация о компании обновлена')
-            return redirect('mycompany_update')
-        context = self.extra_context
-        context['form'] = form
-        return render(request, self.template_name, context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        msgs = [msg.message for msg in self.request._messages]
+        context['msg'] = msgs[0] if msgs else ''
+        context['page'] = 'company'
+        context['info'] = 'Информация о компании'
+        return context
 
 
 class MyCompanyVacancyList(LoginRequiredMixin, ListView):
@@ -247,29 +242,27 @@ class MyCompanyVacancyList(LoginRequiredMixin, ListView):
 class MyCompanyVacancyCreate(LoginRequiredMixin, HasCompanyMixin, CreateView):
     form_class = VacancyForm
     template_name = 'catalog/employer/mycompany_vacancy.html'
-    extra_context = {'page': 'vacancies', 'title': 'Создание вакансии'}
 
-    def get(self, request, *args, **kwargs):
-        form = self.form_class()
-        context = self.extra_context
-        context['form'] = form
-        return render(request, self.template_name, context)
+    def form_valid(self, form):
+        form.instance.company = self.request.user.company
+        form.instance.published_at = date.today()
+        messages.success(self.request, 'Вакансия создана')
+        return super().form_valid(form)
 
-    def post(self, request, *args, **kwargs):
-        form = self.form_class(request.POST)
-        if form.is_valid():
-            vacancy = form.save(commit=False)
-            vacancy.company = request.user.company
-            vacancy.published_at = date.today()
-            vacancy.save()
-            messages.success(request, 'Вакансия создана')
-            return redirect('mycompany_vacancy_update', vacancy.id)
-        context = self.extra_context
-        context['form'] = form
-        return render(request, self.template_name, context)
+    def get_success_url(self):
+        return reverse('mycompany_vacancy_update', args=[self.object.id])
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        msgs = [msg.message for msg in self.request._messages]
+        context['msg'] = msgs[0] if msgs else ''
+        context['page'] = 'vacancies'
+        context['title'] = 'Создание вакансии'
+        return context
 
 
 class MyCompanyVacancyUpdate(LoginRequiredMixin, UpdateView):
+    model = Vacancy
     form_class = VacancyForm
     template_name = 'catalog/employer/mycompany_vacancy.html'
 
@@ -285,33 +278,19 @@ class MyCompanyVacancyUpdate(LoginRequiredMixin, UpdateView):
             )
         except Vacancy.DoesNotExist:
             raise PermissionDenied('Вы не можете редактировать вакансии чужой компании.')
+        if self.request.method == 'POST':
+            messages.success(self.request, 'Информация о вакансии обновлена')
         return vacancy
 
-    def get(self, request, *args, **kwargs):
-        vacancy = self.get_object()
-        form = self.form_class(instance=vacancy)
-        msgs = [msg.message for msg in request._messages]
-        msg = msgs[0] if msgs else ''
-        context = {
-            'form': form,
-            'vacancy': vacancy,
-            'msg': msg,
-            'page': 'vacancies',
-            'title': vacancy.title,
-        }
-        return render(request, self.template_name, context)
+    def get_success_url(self):
+        return reverse('mycompany_vacancy_update', args=[self.object.id])
 
-    def post(self, request, **kwargs):
-        vacancy = self.get_object()
-        form = self.form_class(request.POST, instance=vacancy)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Информация о вакансии обновлена')
-            return redirect('mycompany_vacancy_update', kwargs['vacancy_id'])
-        context = {
-            'form': form,
-            'vacancy': vacancy,
-            'page': 'vacancies',
-            'title': vacancy.title,
-        }
-        return render(request, self.template_name, context)
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        vacancy = self.object
+        msgs = [msg.message for msg in self.request._messages]
+        context['msg'] = msgs[0] if msgs else ''
+        context['page'] = 'vacancies'
+        context['title'] = 'Создание вакансии'
+        context['title'] = vacancy.title
+        return context
