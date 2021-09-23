@@ -15,25 +15,24 @@ class CompanyAdmin(admin.ModelAdmin):
 
 @admin.register(Application)
 class ApplicationAdmin(admin.ModelAdmin):
-    list_display = ('title', 'written_username', 'written_phone', 'vacancy', 'user')
-    readonly_fields = ('title', 'user')
+    list_display = ('title', 'written_phone', 'vacancy')
+    readonly_fields = ('title',)
 
     @admin.display(description='Заголовок')
     def title(self, application):
         return f'{application.written_username} откликнулся на "{application.vacancy}"'
 
-    def save_model(self, request, application, form, change):
-        if not change:
-            application.user = request.user
-        application.save()
-
 
 @admin.register(Specialty)
 class SpecialtyAdmin(admin.ModelAdmin):
     list_display = ('title', 'code')
-    readonly_fields = ('title', 'code')
 
 
 @admin.register(Resume)
 class ResumeAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('title', 'status', 'specialty', 'grade', 'portfolio')
+    readonly_fields = ('title',)
+
+    @admin.display(description='Заголовок')
+    def title(self, resume):
+        return f'Резюме пользователя {resume.user}'

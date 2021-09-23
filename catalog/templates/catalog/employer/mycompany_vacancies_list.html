@@ -5,9 +5,7 @@
 
 {% block content %}
   <style>
-    body {
-      background-color: #F6F2E6;
-    }
+    body {background-color: #F6F2E6;}
   </style>
 
   <main class="container mt-3 pb-5">
@@ -34,7 +32,9 @@
                       <div class="col-6 col-lg-8">
                         <a href="{% url 'vacancy_detail' vacancy.id %}" class="mb-1">{{vacancy}}</a>
                         <p class="mb-1">
-                          <span class="mr-4">{{vacancy.salary_max|intcomma}}</span>
+                          <span class="mr-4">
+                            {{vacancy.salary_min|intcomma}} - {{vacancy.salary_max|intcomma}}
+                          </span>
                           <a href="{% url 'mycompany_vacancy_update' vacancy.id %}#applications" class="text-info">
                             откликов {{vacancy.applications_count}}
                           </a>

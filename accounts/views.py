@@ -12,9 +12,6 @@ class LoginUser(LoginView):
     template_name = 'accounts/login.html'
     redirect_authenticated_user = True
 
-    def get_success_url(self):
-        return reverse_lazy('index')
-
 
 class RegisterUser(CreateView):
     form_class = RegistrationForm

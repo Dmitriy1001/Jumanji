@@ -1,7 +1,8 @@
 import logging
 import logging.config
-from datetime import date, datetime
+from datetime import datetime
 
+import pytz
 from django.core.management.base import BaseCommand
 
 from catalog import data
@@ -78,9 +79,9 @@ class Command(BaseCommand):
                     ),
                 )
 
-    def make_date_obj(self, published_date: str):
-        year, month, day = map(int, published_date.split('-'))
-        return date(year, month, day)
+    def make_datetime_obj(self, published_at: str):
+        year, month, day = map(int, published_at.split('-'))
+        return datetime(year, month, day, tzinfo=pytz.timezone('Europe/Moscow'))
 
 
 logging.config.dictConfig({

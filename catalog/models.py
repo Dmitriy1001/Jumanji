@@ -21,10 +21,10 @@ class Vacancy(models.Model):
     description = models.TextField(verbose_name='Текст')
     salary_min = models.PositiveIntegerField(verbose_name='Зарплата от')
     salary_max = models.PositiveIntegerField(verbose_name='Зарплата до')
-    published_at = models.DateField(verbose_name='Опубликовано')
+    published_at = models.DateTimeField(verbose_name='Опубликовано')
 
     class Meta:
-        verbose_name = 'вакансия'
+        verbose_name = 'вакансию'
         verbose_name_plural = 'вакансии'
         ordering = ('-published_at',)
 
@@ -41,7 +41,7 @@ class Company(models.Model):
     owner = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Владелец')
 
     class Meta:
-        verbose_name = 'компания'
+        verbose_name = 'компанию'
         verbose_name_plural = 'компании'
 
     def __str__(self):
@@ -54,7 +54,7 @@ class Specialty(models.Model):
     picture = models.ImageField(upload_to=settings.MEDIA_SPECIALITY_IMAGE_DIR, verbose_name='Картинка')
 
     class Meta:
-        verbose_name = 'специализация'
+        verbose_name = 'специализацию'
         verbose_name_plural = 'специализации'
 
     def __str__(self):
