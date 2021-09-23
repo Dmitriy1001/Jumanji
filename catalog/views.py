@@ -16,7 +16,7 @@ from .forms import ApplicationForm, CompanyForm, VacancyForm, ResumeForm
 from .models import Vacancy, Specialty, Company, Resume
 
 
-# JOB SEEKER
+# JOB SEEKER PART
 
 
 class Index(TemplateView):
@@ -169,7 +169,7 @@ class MyResumeUpdate(LoginRequiredMixin, HasResumeMixin, UpdateView):
         return context
 
 
-# EMPLOYER
+# EMPLOYER(MYCOMPANY) PART
 
 
 class MyCompanyLetsstart(LoginRequiredMixin, HasNotCompanyMixin, TemplateView):
