@@ -1,5 +1,3 @@
-from datetime import date
-
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
@@ -9,6 +7,7 @@ from django.db.models import Count, Q
 from django.http import Http404
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy, reverse
+from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, TemplateView, UpdateView, ListView, DetailView
 
@@ -165,8 +164,7 @@ class MyResumeUpdate(LoginRequiredMixin, HasResumeMixin, UpdateView):
     def get_context_data(self, *args, **kwargs):
         context = super().get_context_data(*args, **kwargs)
         msgs = [msg.message for msg in self.request._messages]
-        msg = msgs[0] if msgs else ''
-        context['msg'] = msg
+        context['msg'] = msgs[0] if msgs else ''
         context['info'] = 'Мое резюме'
         return context
 
@@ -192,8 +190,7 @@ class MyCompanyCreate(LoginRequiredMixin, HasNotCompanyMixin, CreateView):
         context = super().get_context_data(**kwargs)
         msgs = [msg.message for msg in self.request._messages]
         context['msg'] = msgs[0] if msgs else ''
-        context['page'] = 'company'
-        context['info'] = 'Создание компании'
+        context.update({'page': 'company', 'info': 'Создание компании'})
         return context
 
 
@@ -212,8 +209,7 @@ class MyCompanyUpdate(LoginRequiredMixin, HasCompanyMixin, UpdateView):
         context = super().get_context_data(**kwargs)
         msgs = [msg.message for msg in self.request._messages]
         context['msg'] = msgs[0] if msgs else ''
-        context['page'] = 'company'
-        context['info'] = 'Информация о компании'
+        context.update({'page': 'company', 'info': 'Информация о компании'})
         return context
 
 
@@ -227,15 +223,16 @@ class MyCompanyVacancyList(LoginRequiredMixin, ListView):
                 Vacancy.objects.filter(company__owner=self.request.user)
                 .annotate(applications_count=Count('applications'))
                 .select_related('specialty', 'company')
+                .order_by('-published_at')
         )
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         try:
-            context['company'] = self.request.user.company
+            company = self.request.user.company
         except User.company.RelatedObjectDoesNotExist:
-            context['company'] = None
-        context['page'] = 'vacancies'
+            company = None
+        context.update({'company': company, 'page': 'vacancies'})
         return context
 
 
@@ -245,7 +242,7 @@ class MyCompanyVacancyCreate(LoginRequiredMixin, HasCompanyMixin, CreateView):
 
     def form_valid(self, form):
         form.instance.company = self.request.user.company
-        form.instance.published_at = date.today()
+        form.instance.published_at = timezone.now()
         messages.success(self.request, 'Вакансия создана')
         return super().form_valid(form)
 
@@ -256,8 +253,7 @@ class MyCompanyVacancyCreate(LoginRequiredMixin, HasCompanyMixin, CreateView):
         context = super().get_context_data(**kwargs)
         msgs = [msg.message for msg in self.request._messages]
         context['msg'] = msgs[0] if msgs else ''
-        context['page'] = 'vacancies'
-        context['title'] = 'Создание вакансии'
+        context.update({'page': 'vacancies', 'title': 'Создание вакансии'})
         return context
 
 
@@ -290,7 +286,5 @@ class MyCompanyVacancyUpdate(LoginRequiredMixin, UpdateView):
         vacancy = self.object
         msgs = [msg.message for msg in self.request._messages]
         context['msg'] = msgs[0] if msgs else ''
-        context['page'] = 'vacancies'
-        context['title'] = 'Создание вакансии'
-        context['title'] = vacancy.title
+        context.update({'page': 'vacancies', 'title': vacancy.title})
         return context

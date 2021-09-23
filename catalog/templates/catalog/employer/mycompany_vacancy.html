@@ -5,9 +5,7 @@
 {% block content %}
 
   <style>
-    body {
-      background-color: #F6F2E6;
-    }
+    body {background-color: #F6F2E6;}
   </style>
 
   <main class="container mt-3 pb-5">
@@ -33,7 +31,14 @@
 
             <!-- Applications -->
             {% if title != 'Создание вакансии' %}
-              <h2 class="h4 pt-2 pb-3">Отклики - {{vacancy.applications_count}}</h2>
+
+              <h2 class="h4 pt-2 pb-3">
+                {% if vacancy.applications_count %}
+                  Откликов - {{vacancy.applications_count}}
+                {% else %}
+                  Нет откликов
+                {% endif %}
+              </h2>
               <section id="applications">
                 {% for application in vacancy.applications.all %}
                   <div class="card mt-3">
