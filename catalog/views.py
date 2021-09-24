@@ -11,8 +11,8 @@ from django.utils import timezone
 from django.utils.decorators import method_decorator
 from django.views.generic import CreateView, TemplateView, UpdateView, ListView, DetailView
 
-from .mixins import HasCompanyMixin, HasNotCompanyMixin, HasNotResumeMixin, HasResumeMixin
 from .forms import ApplicationForm, CompanyForm, VacancyForm, ResumeForm
+from .mixins import HasCompanyMixin, HasNotCompanyMixin, HasNotResumeMixin, HasResumeMixin
 from .models import Vacancy, Specialty, Company, Resume
 
 
@@ -273,7 +273,7 @@ class MyCompanyVacancyUpdate(LoginRequiredMixin, UpdateView):
                 # такая фильтрация нужна для того, чтобы нельзя было редактировать вакансии чужой компании
             )
         except Vacancy.DoesNotExist:
-            raise PermissionDenied('Вы не можете редактировать вакансии чужой компании.')
+            raise PermissionDenied('Вы можете редактировать вакансии только своей компании.')
         if self.request.method == 'POST':
             messages.success(self.request, 'Информация о вакансии обновлена')
         return vacancy
