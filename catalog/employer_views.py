@@ -62,18 +62,30 @@ class MyCompanyVacancyList(LoginRequiredMixin, ListView):
     context_object_name = 'vacancies'
 
     def get_queryset(self):
+<<<<<<< HEAD
         self.kwargs['user'] = self.request.user
         return (
             Vacancy.objects.filter(company__owner=self.kwargs['user'])
             .annotate(applications_count=Count('applications'))
             .select_related('specialty', 'company')
             .order_by('-published_at')
+=======
+        return (
+                Vacancy.objects.filter(company__owner=self.request.user)
+                .annotate(applications_count=Count('applications'))
+                .select_related('specialty', 'company')
+                .order_by('-published_at')
+>>>>>>> 1dcc37a317c65f609d67136a0d47e9cf296d4d1a
         )
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super().get_context_data(**kwargs)
         try:
+<<<<<<< HEAD
             company = self.kwargs['user'].company
+=======
+            company = self.request.user.company
+>>>>>>> 1dcc37a317c65f609d67136a0d47e9cf296d4d1a
         except User.company.RelatedObjectDoesNotExist:
             company = None
         context.update({'company': company, 'page': 'vacancies'})
